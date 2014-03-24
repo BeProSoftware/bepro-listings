@@ -1,4 +1,4 @@
-bepro-listings
+BePro Listings
 ==============
 
 BePro Listings is a Wordpress plugin and available themes for creating, Directory, Classifieds, and other listing sites. This plugin comes with, google maps, ajax search / filter, and lots more. This is the newest, most feature rich, and best supported listings plugin on wordpress.
