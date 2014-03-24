@@ -1,0 +1,173 @@
+# Translation for BePro Listings
+# Copyright (C) 2012 Beyond Programs LTD (beyondprograms.com)
+# This file is distributed under the same license as BePro Listings.
+# BePro Software Team <support@beprosoftware.com>, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: BePro Listings Translation 1.0\n"
+"Report-Msgid-Bugs-To: translate-devel@lists.sourceforge.net\n"
+"POT-Creation-Date: 2012-09-14 16:20+0200\n"
+"PO-Revision-Date: 2013-07-28 05:39-0400\n"
+"Last-Translator: BePro Software Team <support@beprosoftware.com>\n"
+"Language-Team: bepro software\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Poedit 1.5.7\n"
+
+msgid "Item Information"
+msgstr "Élément Information"
+
+#: wpGoogleMaps.php:882
+msgid "Item Name"
+msgstr "Nom de l'élément"
+
+#: wpGoogleMaps.php:882
+msgid "Cost"
+msgstr "Coût"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Image"
+msgstr "Image"
+
+msgid "Categories"
+msgstr "Catégories"
+
+msgid "Contact Information"
+msgstr "Information de contact"
+
+msgid "First Name"
+msgstr "Prénom"
+
+msgid "Last Name"
+msgstr "Nom"
+
+msgid "Email"
+msgstr "Courrier électronique"
+
+msgid "Phone"
+msgstr "Téléphone"
+
+msgid "Website"
+msgstr "Site web"
+
+msgid "Location Information"
+msgstr "Information de contact"
+
+msgid "Address"
+msgstr "l'adresse ;"
+
+msgid "City"
+msgstr "Ville"
+
+msgid "State"
+msgstr "Etat"
+
+msgid "Country"
+msgstr "Pays"
+
+msgid "Zip / Postal"
+msgstr "Zip / Postal"
+
+msgid "Filter Map"
+msgstr "Type de filtre"
+
+msgid "Listings Map"
+msgstr "Carte des listes"
+
+msgid "From"
+msgstr "De"
+
+msgid "To"
+msgstr "À"
+
+msgid "Date Range"
+msgstr "Plage de date"
+
+msgid "Price Range"
+msgstr "Intervalle d'impression"
+
+msgid "Distance"
+msgstr "Distance"
+
+msgid "Where"
+msgstr "Où"
+
+msgid "Name"
+msgstr "Nom"
+
+#: bepro_listings.php:234
+msgid "Listing Types"
+msgstr "Liste des Types"
+
+#: bepro_listings.php:276
+msgid "Free"
+msgstr "Libre"
+
+#: bepro_listings.php:278
+msgid "Please Contact"
+msgstr "Fusionner le contact"
+
+#: bepro_listings.php:285
+msgid "View Map"
+msgstr "Voir la carte"
+
+#: ------------Admin Area---------------- bepro_listings_admin.php:258
+msgid "Show Cost"
+msgstr "Indiquer le coût"
+
+#: bepro_listings_admin.php:259
+msgid "Show Contact"
+msgstr "Afficher le contact"
+
+#: bepro_listings_admin.php:260
+msgid "Show Geography"
+msgstr "Afficher le graphique "
+
+#: bepro_listings_admin.php:261
+msgid "# Of Images"
+msgstr "# d'Images"
+
+#: bepro_listings_admin.php:274
+msgid "Validate Form"
+msgstr "Valider le formulaire"
+
+#: bepro_listings_admin.php:275
+msgid "Default User Id"
+msgstr "Default User Id"
+
+#: bepro_listings_admin.php:276
+msgid "Success Message"
+msgstr "Message de réussite"
+
+#: bepro_listings_admin.php:279
+msgid "Default Listing Image"
+msgstr "Image de liste par défaut"
+
+#: bepro_listings_admin.php:280
+msgid "Default # Listings"
+msgstr "Annonces # par défaut"
+
+#: bepro_listings_admin.php:288
+msgid "Default Search Distance (Mi)"
+msgstr "Distance de recherche (Mi)"
+
+#: bepro_listings_admin.php:299
+msgid "Gallery Size"
+msgstr "Taille de la galerie"
+
+#: bepro_listings_admin.php:305
+msgid "Show Details"
+msgstr "Afficher les détails"
+
+#: bepro_listings_admin.php:306
+msgid "Show Content"
+msgstr "Afficher le contenu"
+
+#: bepro_listings_admin.php:319
+msgid "Our Link in your footer?"
+msgstr "Notre lien à votre pied de page ?"

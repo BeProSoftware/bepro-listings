@@ -1,0 +1,27 @@
+/* Shortened listing results */
+.shortcode_results_1{	width: 170px;	float: left;	margin-left: 7px;	background-color: #fff;	padding: 5px 10px;	height: 335px;	margin-top: 10px;
+}.shortcode_results_1 .result_type{	clear:both;	display:block;	font-size:10px;height: 25px;overflow:hidden;}.shortcode_results_1 .result_name{	clear:both;	display:block;	font-size:14px;	font-weight:bold;}
+.shortcode_results_1 table{
+	margin:0;
+}
+.shortcode_results_1 .result_img img{
+	width:100%;
+	margin:auto;
+	display: block;
+	height: 150px;
+}
+.shortcode_results_1 .result_button{
+	margin:0 3px;
+}
+
+.shortcode_results_1  .result_title{
+	display: block;
+    margin: 5px 0;
+}
+
+.shortcode_results_1 .result_desc{
+	margin:0 0 5px 0;
+	display:block;
+	height: 105px;
+	overflow: hidden;
+}

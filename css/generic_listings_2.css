@@ -1,0 +1,123 @@
+/* normal listings results */
+
+.shortcode_results_2{
+	width:99%;
+	float: left;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border: 1px solid;
+	margin-bottom: 10px;
+	overflow: hidden;
+	background-color: #fff;
+	box-shadow: 1px 1px;
+	-moz-box-shadow: 1px 1px;
+	-webkit-box-shadow: 1px 1px;
+}
+.shortcode_results_2 .result_name{
+	font-weight: bold;
+}
+.shortcode_results_2 .result_location{
+	float: right;
+	width:218px;
+}
+.shortcode_results_2 .result_img img{
+    float: left;
+    margin-right: 1%;
+	width: 25%;
+	height: 160px;
+}
+.shortcode_results_2 .result_content{
+	width: 73%;
+	float: left;
+	margin:0 4px;
+}
+.shortcode_results_2 .result_title {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: normal;
+	color: black;
+	width: 100%;
+	padding-right: 5px;
+	text-align: left;
+	margin-top: 5px;
+	border-bottom: 1px solid #000;
+}
+.shortcode_results_2 .result_desc {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	height: 115px;
+	margin-top: 5px;
+	margin-bottom: 7px;
+	float: left;
+	overflow: hidden;
+	width: 74%;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #999;
+	white-space: pre-line;
+}
+
+
+.shortcode_results_2 .booking_link {
+	width: 132px;
+	float: right;
+	overflow: hidden;
+	background: url(images/bookonline_button.png) no-repeat 0 0;
+	text-align: center;
+	font-weight: bold;
+	color: white;
+	height: 30px;
+	padding: 6px 11px 0;
+	clear: both;
+	margin-right:5px;
+}	
+.result_button a{
+	text-decoration:none;
+}
+.result_button a:hover {
+	text-decoration:underline;
+}
+.shortcode_results_2 .listwebsite {
+	width: 115px;
+	float: right;
+	overflow: hidden;
+	background-repeat: no-repeat;
+	text-align: right;
+	background-position: right top;
+	font-weight: bold;
+	color: white;
+	height: 24px;
+	padding-right: 40px;
+	padding-top: 4px;
+	clear: none;
+	margin-right: 5px;
+}
+.shortcode_results_2 .result_type{
+	display: block;
+	float: right;
+	padding-right: 10px;
+}
+.shortcode_results_2  .result_rating {
+float: left;
+}
+.shortcode_results_2  .rating{
+	float: left;
+}
+.shortcode_results_2  .result_cost{
+	float: left;
+}
+.shortcode_results_2  .result_button{
+	background-repeat: repeat-x;
+	background-color: #EBEBEB;
+	color: #DA0505;
+	float: right;
+	font-weight: bold;
+	height: 24px;
+	margin-right: 5px;
+	overflow: hidden;
+	text-align: center;
+	width: 86px;
+	border: 1px solid black;
+	border-radius: 5px;
+}
