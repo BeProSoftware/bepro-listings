@@ -3,9 +3,9 @@
 .shortcode_results_2{
 	width:99%;
 	float: left;
-	border-radius: 5px;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
+	border-radius: 0 5px 5px 5px;
+	-moz-border-radius: 0 5px 5px 5px;
+	-webkit-border-radius: 0 5px 5px 5px;
 	border: 1px solid;
 	margin-bottom: 10px;
 	overflow: hidden;
@@ -25,7 +25,7 @@
     float: left;
     margin-right: 1%;
 	width: 25%;
-	height: 160px;
+	height: 100%;
 }
 .shortcode_results_2 .result_content{
 	width: 73%;
@@ -56,6 +56,8 @@
 	border-bottom-style: solid;
 	border-bottom-color: #999;
 	white-space: pre-line;
+	margin-left: -1%;
+	padding-left: 1%;
 }
 
 
@@ -119,5 +121,19 @@ float: left;
 	text-align: center;
 	width: 86px;
 	border: 1px solid black;
+	margin-bottom: 5px;
 	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+}
+
+/* Featured */
+.shortcode_results_2 .result_featured{
+	background: transparent url(../images/bepro_listings_featured.png) no-repeat 0 0;
+	height: 117px;
+	width: 118px;
+	float: left;
+	left: 0;
+	margin: -26px 0 0 -27%;
+	opacity: .99;
 }

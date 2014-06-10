@@ -7,5 +7,5 @@
  */
 
 if ( comments_open() ) : ?>
-	<li class="comments_tab"><a href="#tab-comments"><?php _e('Comments', 'bepro_listings'); ?><?php echo comments_number(' (0)', ' (1)', ' (%)'); ?></a></li>
+	<li class="comments_tab"><?php _e(apply_filters("bl_comments_label",'Comments'), 'bepro-listings'); ?><?php echo comments_number(' (0)', ' (1)', ' (%)'); ?></li>
 <?php endif; ?>

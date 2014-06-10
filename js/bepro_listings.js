@@ -64,4 +64,20 @@ jQuery(document).ready(function($) {
 		}
 	});
 	
+	if($("#bepro_listings_tabs")){
+		$( "#bepro_listings_tabs" ).tabs();
+	}
+	
+	map_count = 0;
+	$(".frontend_bepro_listings_vert_tabs").easyResponsiveTabs({           
+	type: 'vertical',           
+	width: 'auto',
+	fit: true,
+	activate: function(event) { 
+		if((event.target.className == "map_tab resp-tab-item resp-tab-active") && (map_count == 0)){
+			launch_frontend_map();
+			map_count++;
+		} 
+	}
+	});
 });	

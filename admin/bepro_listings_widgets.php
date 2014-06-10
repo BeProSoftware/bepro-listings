@@ -69,7 +69,7 @@ class bepro_widgets {
 	$data["echo_this"] = true;
     echo $args['before_widget'];
     echo $args['before_title'] .__("Listings Map", "bepro-listings"). $args['after_title'];
-    generate_map(array(), $data);
+    bepro_generate_map(array(), $data);
     echo $args['after_widget'];
   }
 

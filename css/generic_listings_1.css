@@ -25,3 +25,12 @@
 	height: 105px;
 	overflow: hidden;
 }
+.shortcode_results_1 .result_featured {
+	background: transparent url(../images/bepro_listings_featured.png) no-repeat 0 0;
+	height: 75px;
+	width: 75px;
+	float: left;
+	position:absolute;
+	opacity: .99;
+	background-size: 105px;
+}

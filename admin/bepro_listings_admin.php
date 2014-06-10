@@ -384,6 +384,9 @@
 			$data["show_con"] = $_POST["show_con"];
 			$data["show_geo"] = $_POST["show_geo"];
 			$data["num_images"] = $_POST["num_images"];
+			$data["cat_heading"] = $_POST["cat_heading"];
+			$data["cat_empty"] = $_POST["cat_empty"];
+			$data["cat_singular"] = $_POST["cat_singular"];
 	
 			//forms
 			$data["validate_form"] = $_POST["validate_form"];
@@ -406,6 +409,8 @@
 			$data["distance"] = $_POST["distance"];
 			$data["details_link"] = $_POST["details_link"];
 			$data["show_web_link"] = $_POST["show_web_link"];
+			$data["show_date"] = $_POST["show_date"];
+			$data["currency_sign"] = $_POST["currency_sign"];
 			
 			//Page/post
 			$data["gallery_size"] = $_POST["gallery_size"];
@@ -424,13 +429,43 @@
 			$data["footer_link"] = $_POST["footer_link"];
 			
 			update_option("bepro_listings", $data);
+			
+			if(isset($_FILES["csv_upload"]) && !empty($_FILES["csv_upload"]["size"])){
+				$delimiter = $_POST["csv_upload_delimiter"];
+				$file_path = $_FILES["csv_upload"]["tmp_name"];
+				$file = fopen($file_path, 'r');
+				$csv_titles = array();
+				$counter = 0;
+				while (($results = fgetcsv($file, 1500, $delimiter)) !== false){
+					if($counter > 0){
+						$_POST = "";
+						foreach($results as $key => $result){
+							$_POST[$csv_titles[$key]] = $result;
+						}
+						
+						if(!empty($csv_titles[0])){
+							$_POST["save_bepro_listing"] = 1;
+							$post_id = bepro_listings_save(false, true);
+							
+							if(!empty($_POST["photo"])){
+								$remote_url = addslashes(strip_tags($_POST["photo"]));
+								bl_attach_remote_file($post_id, $remote_url);
+							}
+						}
+					}else{
+						$csv_titles = array_values($results);
+					}
+					$counter++;
+				}
+				fclose($file);
+			}
 		}
 		
 		
 		?>
 		<h1>BePro Listings Options</h1>
 		<div class="wrap bepro_listings_admin_form">
-			<form class="bepro_listings" method="post">
+			<form class="bepro_listings" method="post" enctype="multipart/form-data">
 				<input type="hidden" name="update_options" value="1" />
 				<div id="bepro_listings_tabs">
 					<ul>
@@ -440,7 +475,8 @@
 						<li><a href="#tabs-4">Page/Post</a></li>
 						<li><a href="#tabs-5">Map</a></li>
 						<li><a href="#tabs-6">Buddypress</a></li>
-						<li><a href="#tabs-7">Support</a></li>
+						<li><a href="#tabs-7">CSV Upload</a></li>
+						<li><a href="#tabs-8">Support</a></li>
 					</ul>
 				
 					<div id="tabs-1">
@@ -458,7 +494,10 @@
 							<option value="8" <?php echo ($data["num_images"]== 8)? 'selected="selected"':"" ?>>8</option>
 							<option value="9" <?php echo ($data["num_images"]== 9)? 'selected="selected"':"" ?>>9</option>
 							<option value="0" <?php echo ($data["num_images"]== 0)? 'selected="selected"':"" ?>>None</option>
-						</select>
+						</select><br />
+						<span class="form_label"><?php _e("Category Heading", "bepro-listings"); ?></span><input type="input" name="cat_heading" value="<?php echo $data["cat_heading"]; ?>"><br />
+						<span class="form_label"><?php _e("Category Empty", "bepro-listings"); ?></span><input type="input" name="cat_empty" value="<?php echo $data["cat_empty"]; ?>"><br />
+						<span class="form_label"><?php _e("Category Singular", "bepro-listings"); ?></span><input type="input" name="cat_singular" value="<?php echo $data["cat_singular"]; ?>"><br />
 					</div>
 					<div id="tabs-2">
 						<span class="form_label"><?php _e("Validate Form", "bepro-listings"); ?></span><input type="checkbox" name="validate_form" <?php echo ($data["validate_form"]== (1 || "on"))? 'checked="checked"':"" ?>><br />
@@ -478,6 +517,7 @@
 							<option value="1" <?php echo ($data["link_new_page"] == 1)? 'selected="selected"':"" ?>>Go To Page</option>
 							<option value="2" <?php echo ($data["link_new_page"] == 2)? 'selected="selected"':"" ?>>New Tab</option>
 							<option value="3" <?php echo ($data["link_new_page"] == 3)? 'selected="selected"':"" ?>>Ajax Page</option>
+							<option value="4" <?php echo ($data["link_new_page"] == 4)? 'selected="selected"':"" ?>>Hide Internal</option>
 						</select><br />
 						<span class="form_label"><?php _e("Ajax On?", "bepro-listings"); ?></span><input type="checkbox" name="ajax_on" <?php echo ($data["ajax_on"]== (1 || "on"))? 'checked="checked"':"" ?>><br />
 						<span class="form_label"><?php _e("Default # Listings", "bepro-listings"); ?></span><select name="num_listings">
@@ -501,7 +541,9 @@
 						</select>
 						<span style="clear:both;display: block;"><br /></span>
 						<span class="form_label"><?php _e("Details Link Text", "bepro-listings"); ?></span><input type="text" name="details_link" value="<?php echo $data["details_link"]; ?>" /></br>
-						<span class="form_label"><?php _e("Show Website Link?", "bepro-listings"); ?></span><input type="checkbox" name="show_web_link" <?php echo ($data["show_web_link"]== (1 || "on"))? 'checked="checked"':"" ?>><br />
+						<span class="form_label"><?php _e("Show Website Link?", "bepro-listings"); ?></span><input type="checkbox" name="show_web_link" <?php echo (($data["show_web_link"]==1) || ($data["show_web_link"]== "on"))? 'checked="checked"':"" ?> value="1"><br />
+						<span class="form_label"><?php _e("Currency Sign?", "bepro-listings"); ?></span><input type="text" name="currency_sign" value="<?php echo $data["currency_sign"]; ?>" /></br>
+						<span class="form_label"><?php _e("Show Date filter?", "bepro-listings"); ?></span><input type="checkbox" name="show_date" <?php echo ($data["show_date"]== (1))? 'checked="checked"':"" ?> value="1"><br />
 						<span style="clear:both;display: block;"><br /></span>
 					</div>
 					<div id="tabs-4">
@@ -530,6 +572,15 @@
 						<span class="form_label"><?php _e("Buddypress", "bepro-listings"); ?></span><input type="checkbox" name="buddypress" <?php echo ($data["buddypress"]== (1 || "on"))? 'checked="checked"':"" ?>>
 					</div>
 					<div id="tabs-7">
+						<p>CSV upload documenation avaialble <a href="http://beprosoftware.com/products/bepro-listings" target="_blank">here</a></p>
+						<span class="form_label"><?php _e("CSV File", "bepro-listings"); ?></span><input type="file" name="csv_upload" value=""><br />
+						<span class="form_label"><?php _e("Delimiter", "bepro-listings"); ?></span><select name="csv_upload_delimiter">
+							<option value=";">;</option>
+							<option value=",">,</option>
+							<option value="#*">#*</option>
+						</select>
+					</div>
+					<div id="tabs-8">
 						<a href="http://beprosoftware.com"><img src="<?php echo BEPRO_LISTINGS_PLUGIN_PATH."/images/bepro_software_logo.png"; ?>"></a><br />
 						<iframe width="560" height="315" src="//www.youtube.com/embed/D5YpZX0go88" frameborder="0" allowfullscreen></iframe>
 						<p><b>THANK YOU</b> for your interest and support of this plugin. Our BePro Software Team is dedicated to providing you with the tools needed for great websites. You can get involved in any of the following ways:</p>
@@ -545,7 +596,7 @@
 						</ul>
 						<h2>Support For The Plugin</h2>
 						<ul style="border:1px solid; padding:10px">		
-							<li><span style="color:green;font-weight:bold;font-size:18px;text-decoration:underline">Rate Us</span></a> - Give this plugin a <span style="color:green;font-weight:bold;font-size:18px;text-decoration:underline">rating</span> on <a href="http://wordpress.org/support/view/plugin-reviews/bepro-listings" target="_blank">Wordpress.org</a>. This is the best way to support the plugin and encourage its growth</li>
+							<li><a href="http://wordpress.org/support/view/plugin-reviews/bepro-listings" target="_blank"><span style="color:green;font-weight:bold;font-size:18px;text-decoration:underline">Rate Us</span></a> - Give this plugin a <a href="http://wordpress.org/support/view/plugin-reviews/bepro-listings" target="_blank"><span style="color:green;font-weight:bold;font-size:18px;text-decoration:underline">rating</span></a> on <a href="http://wordpress.org/support/view/plugin-reviews/bepro-listings" target="_blank">Wordpress.org</a>. This is the best way to support the plugin and encourage its growth</li>
 							<li>Donations - We accept donations of any amount <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=support@beprosoftware.com&item_name=Donation+for+BePro+Listings">via paypal</a></li>
 							<li><?php _e("Our Link in your footer?", "bepro-listings"); ?> - <input style="vertical-align:middle" type="checkbox" name="footer_link" value="1" <?php echo ($data["footer_link"]== ("on" || 1))? 'checked="checked"':"" ?>></li>
 						</ul>

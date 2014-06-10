@@ -3,13 +3,13 @@
 Plugin Name: BePro Listings
 Plugin Script: bepro_listings.php
 Plugin URI: http://www.beprosoftware.com/shop
-Description: Everything needed to create a Listings site (directory, classifieds, store finder, portfolio). Base features include, front end upload, gallery, buddypress integration, ajax search and filter. Use google maps and various listing templates to showcase info.
-Version: 2.1.12
+Description: Create any directory website (Business, classifieds, real estate, etc). Base features include, front end upload, gallery, buddypress integration, ajax search and filter. Use google maps and various listing templates to showcase info. Put this shortcode [bl_all_in_one] in any page or post. Visit website for other shortcodes
+Version: 2.1.28
 License: GPL V3
 Author: BePro Software Team
 Author URI: http://www.beprosoftware.com
 
- 
+
 Copyright 2012 [Beyond Programs LTD.](http://www.beyondprograms.com/)
 
 Commercial users are requested to, but not required to contribute, promotion, 
@@ -45,8 +45,9 @@ class Bepro_listings{
 		include(dirname( __FILE__ ) . '/admin/bepro_listings_admin.php');
 		include(dirname( __FILE__ ) . '/admin/bepro_listings_widgets.php');
 		include(dirname( __FILE__ ) . '/bepro_listings_frontend.php');
+		include(dirname( __FILE__ ) . '/bepro_listings_profile.php');
 		
-		add_action('init', 'create_post_type' );
+		add_action('init', 'bepro_create_post_type' );
 		add_action('init', array($this, 'check_flush_permalinks') );
 		add_action('admin_init', 'bepro_admin_init' );
 		add_action('admin_head', 'bepro_admin_head' );
@@ -74,8 +75,10 @@ class Bepro_listings{
 		add_action( 'edit_term', 'bepro_listings_category_thumbnail_field_save', 10,3 );
 		add_action( 'bepro_listings_tabs', 'bepro_listings_description_tab', 10 );
 		add_action( 'bepro_listings_tabs', 'bepro_listings_comments_tab', 20 );
+		add_action( 'bepro_listings_tabs', 'bepro_listings_maps_tab', 21 );
 		add_action( 'bepro_listings_tab_panels', 'bepro_listings_description_panel', 10 );
 		add_action( 'bepro_listings_tab_panels', 'bepro_listings_comments_panel', 20 );
+		add_action( 'bepro_listings_tab_panels', 'bepro_listings_maps_panel', 21 );
 		
 		//item page template
 		$data = get_option("bepro_listings");
@@ -102,11 +105,13 @@ class Bepro_listings{
 		//shortcodes
 		add_shortcode("search_form", array( $this, "searchform"));
 		add_shortcode("filter_form", array( $this, "search_filter_options"));
-		add_shortcode("generate_map", "generate_map");
+		add_shortcode("generate_map", "bepro_generate_map");
 		add_shortcode("display_listings", "display_listings");
 		add_shortcode("display_listing_categories", "display_listing_categories");
 		add_shortcode("create_listing_form", "user_create_listing");
 		add_shortcode("bl_all_in_one", "bl_all_in_one");
+		add_shortcode("bl_my_listings", "bl_my_listings");
+		add_shortcode("bl_search_filter", "search_filter_shortcode");
 		
 	}
 
@@ -278,6 +283,8 @@ class Bepro_listings{
 			}
 		}	
 		
+		$cat_heading = (!empty($_REQUEST["l_type"]) && (is_numeric($_REQUEST["l_type"]) || is_array($_REQUEST["l_type"])))? $data["cat_empty"]:$data["cat_heading"];
+		
 		$search_form = "<div class='filter_search_form'>
 			<form id='filter_search_form' method='post' action='".$listing_page."'>
 				<input type='hidden' name='name_search' value='".$_POST["name_search"]."'>
@@ -286,7 +293,7 @@ class Bepro_listings{
 				<table>
 					<tr>
 						<td>
-						<span class='searchlabel'>".__("Listing Types", "bepro-listings")."</span><br />
+						<span class='searchlabel'>".__($cat_heading, "bepro-listings")."</span><br />
 						";
 			$options = listing_types();
 			foreach($options as $opt){
@@ -317,6 +324,7 @@ class Bepro_listings{
 					<span class="label_sep">'.__("Price Range", "bepro-listings").'</span><span class="form_label">'.__("From", "bepro-listings").'</span><input class="input_text" type="text" name="min_cost" value="'.$_POST["min_cost"].'"><span class="form_label">'.__("To", "bepro-listings").'</span><input class="input_text" type="text" name="max_cost" value="'.$_POST["max_cost"].'">
 				</td></tr>';
 				
+				if($data["show_date"] == (1))
 				$search_form .= '
 				<tr><td>
 					<span class="label_sep">'.__("Date Range", "bepro-listings").'</span><span class="form_label">'.__("From", "bepro-listings").'</span><input class="input_text" type="text" name="min_date" id="min_date" value="'.$_POST["min_date"].'"><span class="form_label">'.__("To", "bepro-listings").'</span><input class="input_text" type="text" name="max_date" id="max_date" value="'.$_POST["max_date"].'">
@@ -327,8 +335,8 @@ class Bepro_listings{
 				$search_form .= '
 				<tr>
 					<td>
-						<input type="submit" class="form-submit" value="'.__("Refine Search", "bepro-listings").'" id="edit-submit" name="find">
-						<a class="clear_search" href="'.get_bloginfo("url")."/".$listing_page.'"><button>Clear Search</button></a>
+						<input type="submit" class="form-submit" value="'.__("Search", "bepro-listings").'" id="edit-submit" name="find">
+						<a class="clear_search" href="'.get_bloginfo("url")."/".$listing_page.'"><button>Clear</button></a>
 					</td>
 				</tr>
 			</table>

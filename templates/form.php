@@ -106,7 +106,7 @@
 		if(!empty($show_cost) && ($show_cost == "on")){		
 			echo '
 			<div class="add_listing_form_cost bepro_form_section">
-				<span class="form_label">'.__("Cost", "bepro-listings").'</span><input type="text" name="cost" value="'.(isset($item->cost)? $item->cost:0).'"><br />';
+				<span class="form_label">'.__(apply_filters("bl_cost_listing_label","Cost"), "bepro-listings").'</span><input type="text" name="cost" value="'.(isset($item->cost)? $item->cost:0).'"><br />';
 			
 			do_action("bepro_listing_form_after_cost", $post_data);
 			echo '</div>';

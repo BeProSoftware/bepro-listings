@@ -17,19 +17,7 @@
 */	
  
 	function bepro_listings_wphead() {
-		echo '<link type="text/css" rel="stylesheet" href="'.plugins_url('css/bepro_listings.css', __FILE__ ).'" ><link type="text/css" rel="stylesheet" href="'.plugins_url('css/jquery-ui-1.8.18.custom.css', __FILE__ ).'" ><meta name=\"plugin\" content=\"Bepro Listings plugin\">
-		<style type="text/css">
-			.l_featured{
-				background-color:#F0E68C;
-				float: left;
-				clear: both;
-				padding:10px 10px 0;
-				border-radius:10px;
-				-moz-border-radius:10px;
-				-webkit-border-radius:10px;
-			}
-		
-		</style>
+		echo '<link type="text/css" rel="stylesheet" href="'.plugins_url('css/bepro_listings.css', __FILE__ ).'" ><link type="text/css" rel="stylesheet" href="'.plugins_url('css/easy-responsive-tabs.css', __FILE__ ).'" ><link type="text/css" rel="stylesheet" href="'.plugins_url('css/jquery-ui-1.8.18.custom.css', __FILE__ ).'" ><meta name=\"plugin\" content=\"Bepro Listings plugin\">
 		
 		';
 		
@@ -39,10 +27,11 @@
 		$data = get_option("bepro_listings");
 		wp_enqueue_script('jquery');
 		wp_enqueue_script('jquery-ui-datepicker');
+		wp_print_scripts('jquery-ui-tabs');
 		wp_enqueue_script('google-maps' , 'http://maps.google.com/maps/api/js' , false , '3.5&sensor=false');
 		$plugindir = plugins_url("bepro-listings");
 		
-		$scripts .= "\n".'<script type="text/javascript" src="'.$plugindir.'/js/bepro_listings.js"></script><script type="text/javascript" src="'.plugins_url("js/markerclusterer.js", __FILE__ ).'"></script><script type="text/javascript" src="'.plugins_url("js/jquery.validate.min.js", __FILE__ ).'"></script><script type="text/javascript" src="'.plugins_url("js/jquery.maskedinput-1.3.min.js", __FILE__ ).'"></script>';
+		$scripts .= "\n".'<script type="text/javascript" src="'.$plugindir.'/js/bepro_listings.js"></script><script type="text/javascript" src="'.plugins_url("js/markerclusterer.js", __FILE__ ).'"></script><script type="text/javascript" src="'.plugins_url("js/jquery.validate.min.js", __FILE__ ).'"></script><script type="text/javascript" src="'.plugins_url("js/jquery.maskedinput-1.3.min.js", __FILE__ ).'"></script><script type="text/javascript" src="'.plugins_url("js/easyResponsiveTabs.js", __FILE__ ).'"></script>';
 		
 		$scripts .= '
 		<script type="text/javascript">
@@ -127,7 +116,7 @@
 				state tinytext DEFAULT NULL,
 				country tinytext DEFAULT NULL,
 				postcode tinytext DEFAULT NULL,
-				website varchar(55) DEFAULT NULL,
+				website varchar(155) DEFAULT NULL,
 				lat varchar(15) DEFAULT NULL,
 				lon varchar(15) DEFAULT NULL,
 				created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -160,6 +149,11 @@
 					<li><a href='www.beprosoftware.com/shop/bepro-listings-audio/'>Audio</a> - Create a, podcasts, music, or any other type of audio focused website. We support, wav, mp3, and several file types</li>
 					<li><a href='www.beprosoftware.com/shop/bepro-listings-favorites/'>Favorites</a> - Allow visitors and registered users to interact with listings. They can record their likes/dislikes and view them via shortcodes</li>
 					<li><a href='www.beprosoftware.com/shop/bepro-listings-authors/'>Authors</a> - Give your Blog writers and their listings more visibility. With this plugin you add their profile info to their listing pages.</li>
+					<li><a href='http://www.beprosoftware.com/shop/bepro-listings-pmpro/'>PMPro</a> (New) - Use Paid Membership Pro to charge users to post listings on your website, with this integration.</li>
+					<li><a href='http://www.beprosoftware.com/shop/bepro-listings-bookings/'>Booking</a> (New) - Setup your availability and allow users to schedule time. Perfect for real estate, vehicle, hotel, and other niche sites</li>
+					<li><a href='http://www.beprosoftware.com/shop/bepro-listings-business-directory/'>Business Directory</a> (New) - Use our business and staff focused listing templates with alphabetic filter. Typical phone book type layout.</li>
+					<li><a href='www.beprosoftware.com/shop/bepro-listings-vehicles/'>Vehicles</a> (New) - Lists cars, boats, trucks, planes, and other automobiles with their details</li>
+					<li><a href='http://www.beprosoftware.com/shop/bepro-listings-reviews/'>Reviews</a> (New) - Users can leave and search by star ratings</li>
 				</ul>
 				<h2>Classifieds / Porfolio / Directory Themes</h2>
 				<p>We also have several $1 one dollar wordpress themes you can purchase with free data. This provides a great tutorial and / or way to get setup quickly</p>
@@ -313,7 +307,7 @@
 		
 		// Current version
 		if ( !defined( 'BEPRO_LISTINGS_VERSION' ) ){
-			define( 'BEPRO_LISTINGS_VERSION', '2.1.12' );
+			define( 'BEPRO_LISTINGS_VERSION', '2.1.28' );
 		}	
 		
 		$data = get_option("bepro_listings");
@@ -331,6 +325,9 @@
 			$data["show_con"] = "on";
 			$data["show_geo"] = "on";
 			$data["num_images"] = 3;
+			$data["cat_heading"] = "Categories";
+			$data["cat_empty"] = "No Categories";
+			$data["cat_singular"] = "Category";
 			//forms
 			$data["validate_form"] = "on";
 			$data["success_message"] = 'Listing Created and pending admin approval.';			
@@ -347,6 +344,8 @@
 			$data["distance"] = 150;
 			$data["details_link"] = "Item";
 			$data["show_web_link"] = "";
+			$data["currency_sign"] = "$";
+			$data["show_date"] = 1;
 			//Page/post
 			$data["gallery_size"] = "thumbnail";
 			$data["gallery_cols"] = 3;
@@ -367,10 +366,21 @@
 			$data['bepro_listings_item_content_template'] = 'bepro_listings_item_content_info';
 			
 			//item list template
-			$data['bepro_listings_list_template_1'] = array("bepro_listings_list_title" => "bepro_listings_list_title_template","bepro_listings_list_below_title" => "bepro_listings_list_category_template","bepro_listings_list_image" => "bepro_listings_list_image_template","bepro_listings_list_content" => "bepro_listings_list_content_template","bepro_listings_list_end" => "bepro_listings_list_links_template", "style" => plugins_url("css/generic_listings_1.css", __FILE__ ));
-			$data['bepro_listings_list_template_2'] = array("bepro_listings_list_title" => "bepro_listings_list_title_template","bepro_listings_list_below_title" => "bepro_listings_list_category_template","bepro_listings_list_above_title" => "bepro_listings_list_image_template","bepro_listings_list_image" => "bepro_listings_list_geo_template","bepro_listings_list_content" => "bepro_listings_list_content_template","bepro_listings_list_end" => "bepro_listings_list_links_template", "style" => plugins_url("css/generic_listings_2.css", __FILE__ ));
+			$data['bepro_listings_list_template_1'] = array("bepro_listings_list_title" => "bepro_listings_list_title_template","bepro_listings_list_above_image" => "bepro_listings_list_featured_template","bepro_listings_list_below_title" => "bepro_listings_list_category_template","bepro_listings_list_image" => "bepro_listings_list_image_template","bepro_listings_list_content" => "bepro_listings_list_content_template","bepro_listings_list_end" => "bepro_listings_list_cost_template","bepro_listings_list_end" => "bepro_listings_list_links_template", "style" => plugins_url("css/generic_listings_1.css", __FILE__ ), "template_file" => plugin_dir_path( __FILE__ ).'/templates/listings/generic_1.php');
+			$data['bepro_listings_list_template_2'] = array("bepro_listings_list_title" => "bepro_listings_list_title_template","bepro_listings_list_above_image" => "bepro_listings_list_featured_template","bepro_listings_list_below_title" => "bepro_listings_list_category_template","bepro_listings_list_above_title" => "bepro_listings_list_image_template","bepro_listings_list_image" => "bepro_listings_list_geo_template","bepro_listings_list_content" => "bepro_listings_list_content_template","bepro_listings_list_end" => "bepro_listings_list_cost_template","bepro_listings_list_end" => "bepro_listings_list_links_template", "style" => plugins_url("css/generic_listings_2.css", __FILE__ ), "template_file" => plugin_dir_path( __FILE__ ).'/templates/listings/generic_2.php');
 			
 			//save
+			update_option("bepro_listings", $data);
+		}
+		
+		//Things that need to change only if there is an upgrade
+		
+		$bepro_listings_version = get_option("bepro_listings_version");
+		if($bepro_listings_version != BEPRO_LISTINGS_VERSION){
+		$bepro_listings_version = get_option("bepro_listings_version");
+			$data["cat_heading"] = "Categories";
+			$data["cat_empty"] = "No Categories";
+			$data["cat_singular"] = "Category";
 			update_option("bepro_listings", $data);
 		}
 	}
@@ -440,7 +450,7 @@
 		exit;
 	}
 	
-	function bepro_listings_save($post_id = false){
+	function bepro_listings_save($post_id = false, $return_post_id = false){
 		global $wpdb;
 		if(!empty($_POST["save_bepro_listing"])){
 			//get settings
@@ -567,11 +577,54 @@
 			}
 		}
 		
+		if($return_post_id)
+			return $post_id;
+		
 		return $return_message;
+	}
+	
+	//function to get a file via url, upload it, and attach to a post
+	
+	function bl_attach_remote_file($post_id, $remote_url){
+		$raw_file = explode("/",$remote_url);
+		$uploads = wp_upload_dir();
+		$filename = $uploads['path']."/".$raw_file[sizeof($raw_file)-1];//get filename
+		if(bl_http_get_file($remote_url, $filename)){
+			$wp_filetype = wp_check_filetype(basename($filename), null );
+			$attachment = array(
+				 'post_mime_type' => $wp_filetype['type'],
+				 'post_title' => $filename,
+				 'post_content' => '',
+				 'post_status' => 'inherit'
+			);
+			$attach_id = wp_insert_attachment( $attachment, $filename, $post_id);
+			$attach_data = wp_generate_attachment_metadata( $attach_id, $filename);
+			wp_update_attachment_metadata( $attach_id, $attach_data );
+			update_post_meta($post_id, '_thumbnail_id', $attach_id);
+		}
+	}
+	
+	function bl_http_get_file($remote_url, $local_file)    {
+		$data = get_option("bepro_listings");
+		$query_type = $data["map_query_type"];
+		
+		$fp = fopen($local_file, 'w');
+		if(empty($query_type) || ($query_type == "curl")){
+			$cp = curl_init($remote_url);
+			curl_setopt($cp, CURLOPT_FILE, $fp);
+			$buffer = curl_exec($cp);
+			curl_close($cp);
+		}else{
+			$fp  =  file_get_contents($remote_url);
+		}
+		fclose($fp);
+		
+		return true;
 	}
 	
 	function get_bepro_lat_lon(){
 		$latlon = array();
+		$data = get_option("bepro_listings");
 		$query_type = $data["map_query_type"];
 		if(!empty($_POST['postcode']) || !empty($_POST['country'])){  
 			$to_addr .= !empty($_POST['address_line1'])? $_POST['address_line1']:"";
@@ -647,7 +700,7 @@
 	}
 	
 	//Create BePro Listings custom post type.
-	function create_post_type() {
+	function bepro_create_post_type() {
 		$labels = array(
 			'name' => _x('BePro Listings', 'post type general name'),
 			'singular_name' => _x('Listing', 'post type singular name'),
@@ -745,12 +798,24 @@
 		include(plugin_dir_path( __FILE__ )."templates/tabs/tab-comments.php");
 	}
 	
+	function bepro_listings_maps_tab(){
+		$data = get_option("bepro_listings");
+		if($data["show_geo"] == "on")
+			include(plugin_dir_path( __FILE__ )."templates/tabs/tab-maps.php");
+	}
+	
 	function bepro_listings_description_panel(){
 		include(plugin_dir_path( __FILE__ )."templates/tabs/description.php");
 	}
 	
 	function bepro_listings_comments_panel(){
 		include(plugin_dir_path( __FILE__ )."templates/tabs/comments.php");
+	}
+	
+	function bepro_listings_maps_panel(){
+		$data = get_option("bepro_listings");
+		if($data["show_geo"] == "on")
+			include(plugin_dir_path( __FILE__ )."templates/tabs/maps.php");
 	}
 
 

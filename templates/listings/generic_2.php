@@ -7,7 +7,7 @@
 	do_action( 'bepro_listings_list_image', $result);
 	do_action( 'bepro_listings_list_after_image', $result);
 	do_action("bepro_listings_list_content", $result);
+	do_action("bepro_listings_after_content", $result);
 	do_action("bepro_listings_list_end", $result);
 ?>
-<div style="clear:both"><br /></div>
 </div>
