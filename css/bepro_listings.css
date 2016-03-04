@@ -22,6 +22,14 @@
 	width:25%;
 	height:25%;
 }
+.ui-datepicker-header{
+	background:#000;
+	color:#fff;
+}
+.ui-datepicker .ui-state-disabled .ui-state-default{
+	background:green;
+	color: #fff;
+}
 
 /* bepro listings map */
 #secondary #map{
@@ -70,7 +78,6 @@
 	clear:left;
 }
 .bepro_listing_desc{
-	float:left;
 	display:block;
 	clear:left;
 	white-space: pre-line;
@@ -89,6 +96,14 @@
 	width:100%;
 	display:block;
 	clear:both;
+}
+#bpl_page_location_tab{
+	float:left;
+	width:30%;
+}
+#page_details_map_wrap{
+	width:69%;
+	float:left;
 }
 .bepro_address_info{
 	width:100%;
@@ -109,10 +124,20 @@
 }
 
 .bepro_listing_category_section{
-	float:left;
 	clear:left;
 }
+/*Details page*/
 
+.bl_succsss_message{
+	font-weight: bold;
+	text-decoration: underline;
+	color: green;
+} 
+.bl_fail_message{
+	font-weight: bold;
+	text-decoration: underline;
+	color: red;
+} 
 .bepro_listings_tabs{
 	clear:both;
 }
@@ -171,6 +196,7 @@
 #tab-map{
 	height:350px;
 }	
+.bl_clear_heading{clear:left;}
 .frontend_bepro_listings_tabs #page_details_map_wrap{
 	width:70%;
 	height:350px;
@@ -191,6 +217,7 @@
 .cat_lists{
 	float:left;
 	clear:both;
+	width: 100%;
 }
 .cat_list_item{
 	float:left;
@@ -221,9 +248,22 @@
 	list-style-type:none;
 }
 /* form layout */
+#bepro_create_listings_form input[type="submit"],#bepro_create_listings_form hr{
+	clear:left;
+}
+.chosen-container {
+  min-width: 150px;
+}
+#bepro_listings_package_tabs{
+	margin-bottom:10px;
+}
+.bl_package_options_table td:nth-child(2){width:36%}
+.package_option{float: left;
+width: 45%;
+border: 1px solid;
+margin-left: 5px;
+padding: 5px;}
 .form_label{
-	width:90px; 
-	margin-right:10px;
 	display:block;
 }
 
@@ -249,9 +289,15 @@
     width: 70%;
 }
 .bepro_form_cat{
-	margin:5px 0;
+	margin:0 5px;
 	float:left;
-	height: 80px;
+	height: 70px;
+	max-width:150px;
+	text-align: center;
+}
+.bepro_form_cat input[type="checkbox"]{
+	display:block;
+	margin:auto;
 }
 .label_sep{	
     clear: both;
@@ -283,6 +329,7 @@
     border: 1px solid;
 	float: left;
 	padding: 10px;
+	width:98%;
 }
 .error{
 	display:block;
@@ -297,6 +344,15 @@
 .filter_search_form .searchcheckbox{
 	margin-left:5px;
 }
+.filter_search_form input[type=checkbox].sub_cat_checkbox_1{
+	margin-left:10px;
+}
+.filter_search_form input[type=checkbox].sub_cat_checkbox_2{
+	margin-left:20px;
+}
+.filter_search_form input[type=checkbox].sub_cat_checkbox_3{
+	margin-left:30px;
+}
 /* Category listings results */
 
 #listings_area h3{
@@ -307,8 +363,19 @@
 	margin:10px 0;
 	float: left;
 }
+/* buddypress */
 
-
+#classified_listings_table td{
+	border:1px solid #CCC; 
+}
+#classified_listings_table tr td:last-child{
+	width:24%;
+}
+#classified_listings_table{margin:10px 0}
+#bl_payment_required_table{margin:10px 0;}
+#bl_hide_bp_create_menu{
+	display:none !important;
+}
 /* Paging */
 .paging{
 	float:right;

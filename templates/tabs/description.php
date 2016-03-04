@@ -11,7 +11,12 @@ global $post;
 if ( $post->post_content ) : ?>
 	<div class="panel entry-content" id="tab-description">
 
-		<?php the_content(); ?>
+		<?php 
+		$content = apply_filters( 'the_content', $post->post_content );
+		$content = str_replace( ']]>', ']]&gt;', $content );
+		$content = stripslashes($content);
+		echo $content;
+		?>
 
 	</div>
 <?php endif; ?>

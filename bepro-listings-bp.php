@@ -13,11 +13,42 @@
 		$user_id = $bp->displayed_user->id;
 		
 		// get records
-		$items = $wpdb->get_results("SELECT geo.*, wp_posts.post_title, wp_posts.post_status FROM ".$wpdb->prefix.BEPRO_LISTINGS_TABLE_NAME." as geo 
-		LEFT JOIN ".$wpdb->prefix."posts as wp_posts on wp_posts.ID = geo.post_id WHERE wp_posts.post_status != 'trash' AND wp_posts.post_author = ".$user_id);
+		$data = get_option("bepro_listings");
+		if(@$data["require_payment"]){
+			$items = $wpdb->get_results("SELECT geo.*, orders.status as order_status, orders.expires, wp_posts.post_title, wp_posts.post_status FROM ".$wpdb->prefix.BEPRO_LISTINGS_TABLE_NAME." as geo 
+			LEFT JOIN ".$wpdb->prefix."posts as wp_posts on wp_posts.ID = geo.post_id 
+			LEFT JOIN ".BEPRO_LISTINGS_ORDERS_TABLE_NAME." AS orders on orders.bl_order_id = geo.bl_order_id WHERE wp_posts.post_status != 'trash' AND wp_posts.post_author = ".$user_id);
+		}else{
+			$items = $wpdb->get_results("SELECT geo.*, wp_posts.post_title, wp_posts.post_status FROM ".$wpdb->prefix.BEPRO_LISTINGS_TABLE_NAME." as geo 
+			LEFT JOIN ".$wpdb->prefix."posts as wp_posts on wp_posts.ID = geo.post_id WHERE wp_posts.post_status != 'trash' AND wp_posts.post_author = ".$user_id);
+		}
 		
 		$listing_url = $bp->loggedin_user->domain.$bp->current_component."/".BEPRO_LISTINGS_CREATE_SLUG."/";
-		require( dirname( __FILE__ ) . '/templates/list.php' );
+		
+		//allow addons to override create listing button. The default for buddypress is to not have a button
+		$add_new_button = apply_filters("bl_change_add_listing_button", false, $listing_url);
+		if($add_new_button && bp_is_my_profile())
+			echo $add_new_button;
+		
+		//allow addons to change profile template
+		$bl_my_list_template = apply_filters("bl_change_my_list_template",dirname( __FILE__ ) . '/templates/list.php', $items);
+		if($bl_my_list_template)
+			require( $bl_my_list_template );
+	}
+	
+	function show_visitor_profile($template, $items){
+		$ids = array();
+		foreach($items as $item){
+			$ids[] = $item->post_id;
+		}
+		echo "<h2>My Listings</h2>";
+		if((sizeof($ids) > 0) && ($ids[0] != NULL)){
+			echo do_shortcode("[display_listings l_ids='".implode(",", $ids)."' type='2' show_paging=1]");
+		}else{
+			echo "<p>".__("No live listings for this user","bepro-listings")."</p>";
+		}
+		echo "<div style='clear:both'><br /></div>";
+		return "";
 	}
 	
     function create_listings() {
@@ -31,9 +62,9 @@
 			$success = false;
 			$success = bepro_listings_save();
 			if($success)
-				$message = urlencode("Success saving listing");
+				$message = urlencode(__("Success saving listing","bepro-listings"));
 			else
-				$message = urlencode("Error saving listing");
+				$message = urlencode(__("Error saving listing","bepro-listings"));
 			$current_user = wp_get_current_user();
 			$bp_profile_link = bp_core_get_user_domain( $bp->displayed_user->id);
 			wp_redirect($bp_profile_link  . BEPRO_LISTINGS_SLUG ."?message=".$message);
@@ -59,15 +90,28 @@
 		$show_geo = $data["show_geo"];
 		
 		$listing_url = $bp->loggedin_user->domain.$bp->current_component;
-		require( dirname( __FILE__ ) . '/templates/form.php' );
+		$frontend_form = dirname( __FILE__ )."/templates/form.php";
+		$frontend_form = apply_filters("bl_change_upload_form", $frontend_form);
+		if($frontend_form)
+			require( $frontend_form );
 	}
 	
 	function update_listing_content(){
 		global $wpdb, $bp, $post;
 		$data = get_option("bepro_listings");
+		$listing_url = $bp->loggedin_user->domain.$bp->current_component."/";
 		//get information 
 		$item = $wpdb->get_row("SELECT * FROM ".$wpdb->prefix.BEPRO_LISTINGS_TABLE_NAME." WHERE id = ".$bp->action_variables[0]);
+		if(!$item){
+			header("Location: ".$listing_url."?message=Listing Does not exist");
+			exit;
+		}	
 		$post_data = get_post($item->post_id);
+		$user_id = get_current_user_id();
+		if($post_data->post_author != $user_id){
+			header("Location: ".$listing_url."?message=".__("You do not own this listing","bepro-listings"));
+			exit;
+		}
 		//get categories
 		$raw_categories = listing_types_by_post($item->post_id);
 		$categories = array();
@@ -111,7 +155,11 @@
 		
 		$siteNo = $bp->groups->current_group->id;
 		$listing_url = $bp->loggedin_user->domain.BEPRO_LISTINGS_SLUG."/";
-		require( dirname( __FILE__ ) . '/templates/form.php' );
+		
+		$frontend_form = dirname( __FILE__ )."/templates/form.php";
+		$frontend_form = apply_filters("bl_change_upload_form", $frontend_form);
+		if($frontend_form)
+			require( $frontend_form );
 	}
  
 	/**
@@ -144,16 +192,23 @@
 			$settings_link = $bp->loggedin_user->domain . BEPRO_LISTINGS_SLUG. '/';
 
 			bp_core_new_nav_item( array(
-					'name' => __( BEPRO_LISTINGS_SLUG, 'buddypress' ),
+					'name' => __( BEPRO_LISTINGS_SLUG, 'bepro-listings' ),
 					'slug' => BEPRO_LISTINGS_SLUG,
 					'position' => 20,
 					'default_subnav_slug' => 'List',
 					'screen_function' => 'display_item_list' 
 			) );
 			
-			bp_core_new_subnav_item( array( 'name' => __( BEPRO_LISTINGS_LIST_SLUG, 'buddypress' ), 'slug' => BEPRO_LISTINGS_LIST_SLUG, 'parent_url' => $settings_link, 'parent_slug' => BEPRO_LISTINGS_SLUG, 'screen_function' => 'display_item_list', 'position' => 10) );
+			bp_core_new_subnav_item( array( 'name' => __( BEPRO_LISTINGS_LIST_SLUG, 'bepro-listings' ), 'slug' => BEPRO_LISTINGS_LIST_SLUG, 'parent_url' => $settings_link, 'parent_slug' => BEPRO_LISTINGS_SLUG, 'screen_function' => 'display_item_list', 'position' => 10) );
 			
-			bp_core_new_subnav_item( array( 'name' => __( BEPRO_LISTINGS_CREATE_SLUG, 'buddypress' ), 'slug' => BEPRO_LISTINGS_CREATE_SLUG, 'parent_url' => $settings_link, 'parent_slug' => BEPRO_LISTINGS_SLUG, 'screen_function' => 'create_listings', 'position' => 90, 'user_has_access' => bp_is_my_profile() ) );
+			//if there is a 3rd party plugin which takes over the creation of listings, then don't show the button
+			$add_new_button = apply_filters("bl_change_add_listing_button", false, "");
+			$item_css_id = "";
+			if($add_new_button){
+				$item_css_id = "bl_hide_bp_create_menu";
+			}
+		
+			bp_core_new_subnav_item( array( 'name' => __( BEPRO_LISTINGS_CREATE_SLUG, 'bepro-listings' ), 'slug' => BEPRO_LISTINGS_CREATE_SLUG, 'parent_url' => $settings_link, 'parent_slug' => BEPRO_LISTINGS_SLUG, 'screen_function' => 'create_listings', 'position' => false, 'user_has_access' => bp_is_my_profile(), 'item_css_id' => $item_css_id) );
 
 
 		  // Change the order of menu items
@@ -165,9 +220,9 @@
 	function bepro_listings_nav_count() {
 			global $bp, $wpdb;
 			
-			$user_id = $bp->displayed_user->id;
+			$user_id = @$bp->displayed_user->id;
 			// This will probably only work on BP 1.3+
-			if ( !empty( $bp->bp_nav[BEPRO_LISTINGS_SLUG]) ) {
+			if ( !empty( $bp->bp_nav[BEPRO_LISTINGS_SLUG]) && $user_id && (is_numeric($user_id))) {
 				$current_tab_name = $bp->bp_nav[BEPRO_LISTINGS_SLUG]['name'];
 
 				$item_count = $wpdb->get_row("SELECT count(*) as item_count FROM ".$wpdb->prefix.BEPRO_LISTINGS_TABLE_NAME." as geo 

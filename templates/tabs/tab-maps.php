@@ -9,5 +9,5 @@
 global $post;
 
 if ( $post->post_content ) : ?>
-	<li class="map_tab"><?php _e('View Map', 'bepro_listings'); ?></li>
+	<li class="map_tab"><?php _e('View Map', 'bepro-listings'); ?></li>
 <?php endif; ?>

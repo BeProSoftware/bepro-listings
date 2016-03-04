@@ -34,3 +34,8 @@
 	opacity: .99;
 	background-size: 105px;
 }
+.niche_details{margin-top:-20px;position:absolute}
+
+#shortcode_list .no_img,.shortcode_results_1.no_img{
+	height:190px;
+}

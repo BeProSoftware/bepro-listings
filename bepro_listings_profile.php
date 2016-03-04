@@ -3,8 +3,9 @@
 	function bl_my_listings(){
 		global $wpdb, $post;
 		$current_url =  get_permalink( $post->ID );
+		$return_text = "";
 		if(!is_user_logged_in()){
-			echo "<p>You need to be Logged In to see your Listings.</p>";
+			$return_text .= "<p>".__("You need to be Logged In to see your Listings.", "bepro-listings")."</p>";
 			$args = array(
 					'echo'           => true,
 					'redirect'       => $current_url, 
@@ -32,14 +33,17 @@
 		if(isset($_POST["save_bepro_listing"]) && !empty($_POST["save_bepro_listing"])){
 			$success = false;
 			$success = bepro_listings_save();
-			if($success)
-				$message = urlencode("Success saving listing");
-			else
-				$message = urlencode("Error saving listing");
+			if($success){
+				$success_message = apply_filters("bepro_form_success_message","Listing Successfully Saved");
+				$message =  "<span class='bl_succsss_message'>".__($success_message,"bepro-listings")."</span>";
+			}else{
+				$fail_message = apply_filters("bepro_form_fail_message",__("Issue saving your listing. Please contact the website administrator","bepro-listings"));
+				$message =  "<span class='bl_fail_message'>".__($fail_message,"bepro-listings")."</span>";
+			}
+			
 			$current_user = wp_get_current_user();
 			$current_url = get_permalink( $post->ID );
-			wp_redirect($current_url ."?message=".$message);
-			exit;
+			echo "<span class='classified_message'>".$message."</span>";
 		}
 		
 		if(!empty($_GET["bl_manage"])){
@@ -49,13 +53,31 @@
 				bl_profile_add_listing_content();
 			}
 		}else{
-		
+			$data = get_option("bepro_listings");
 			// get records
-			$items = $wpdb->get_results("SELECT geo.*, wp_posts.post_title, wp_posts.post_status FROM ".$wpdb->prefix.BEPRO_LISTINGS_TABLE_NAME." as geo 
-			LEFT JOIN ".$wpdb->prefix."posts as wp_posts on wp_posts.ID = geo.post_id WHERE wp_posts.post_status != 'trash' AND wp_posts.post_author = ".$user_id);
+			if(@$data["require_payment"]){
+				$items = $wpdb->get_results("SELECT geo.*, orders.status as order_status, orders.expires, wp_posts.post_title, wp_posts.post_status FROM ".$wpdb->prefix.BEPRO_LISTINGS_TABLE_NAME." as geo 
+				LEFT JOIN ".$wpdb->prefix."posts as wp_posts on wp_posts.ID = geo.post_id 
+				LEFT JOIN ".BEPRO_LISTINGS_ORDERS_TABLE_NAME." AS orders on orders.bl_order_id = geo.bl_order_id WHERE wp_posts.post_status != 'trash' AND wp_posts.post_author = ".$user_id);
+			}else{
+				$items = $wpdb->get_results("SELECT geo.*, wp_posts.post_title, wp_posts.post_status FROM ".$wpdb->prefix.BEPRO_LISTINGS_TABLE_NAME." as geo 
+				LEFT JOIN ".$wpdb->prefix."posts as wp_posts on wp_posts.ID = geo.post_id WHERE wp_posts.post_status != 'trash' AND wp_posts.post_author = ".$user_id);
+			}
 			
 			$listing_url = "?bl_manage=1&bl_id=";
-			require( dirname( __FILE__ ) . '/templates/list.php' );
+			$add_listing_button = "<p><a href='".$listing_url."'>".__("Add a Listing")."</a></p>";
+			
+			//allow addons to override create listing button
+			$return_text .= apply_filters("bl_change_add_listing_button", $add_listing_button, $listing_url);
+			
+			//allow addons to change profile template
+			$bl_my_list_template = apply_filters("bl_change_my_list_template",dirname( __FILE__ ) . '/templates/list.php', $items);
+			
+			ob_start(); 
+			if(!empty($bl_my_list_template))
+				include( $bl_my_list_template );
+			$return_text .= ob_get_clean(); 
+			return $return_text;
 		}
 	}
 	
@@ -111,10 +133,21 @@
 		$cat_drop = $data["cat_drop"];
 		
 		$listing_url = "?bl_manage=1&bl_id=";
-		require( dirname( __FILE__ ) . '/templates/form.php' );
+		$url = get_permalink( $post->ID );
+		if(!empty($_POST["save_bepro_listing"])){
+			echo "<p><a href='".$url."'>".__("Return to List","bepro-listings")."</a></p>";
+		}else{
+			echo "<p><a href='".$url."'>".__("Cancel","bepro-listings")."</a></p>";
+		}
+		
+		$frontend_form = dirname( __FILE__ )."/templates/form.php";
+		$frontend_form = apply_filters("bl_change_upload_form", $frontend_form);
+		if($frontend_form)
+		require( $frontend_form);
 	}
 	
 	function bl_profile_add_listing_content(){
+		global $post;
 		//get settings
 		$data = get_option("bepro_listings");
 		$default_user_id = $data["default_user_id"];
@@ -125,7 +158,17 @@
 		$show_geo = $data["show_geo"];
 		
 		$listing_url = "?bl_manage=1&bl_id=";
-		require( dirname( __FILE__ ) . '/templates/form.php' );
+		$url = get_permalink( $post->ID );
+		if(!empty($_POST["save_bepro_listing"])){
+			echo "<p><a href='".$url."'>".__("Return to My List","bepro-listings")."</a></p>";
+		}else{
+			echo "<p><a href='".$url."'>".__("Cancel","bepro-listings")."</a></p>";
+		}
+		
+		$frontend_form = dirname( __FILE__ )."/templates/form.php";
+		$frontend_form = apply_filters("bl_change_upload_form", $frontend_form);
+		if($frontend_form)
+		require( $frontend_form );
 	}
 
 ?>

@@ -40,44 +40,5 @@ This file is part of BePro Listings.
 
 jQuery(document).ready(function($) {
 
-	$('.bepro_listings_tabs .panel').hide();
-	
-	$('.bepro_listings_tabs ul.tabs li a').click(function(){
-		
-		var $tab = $(this);
-		var $tabs_wrapper = $tab.closest('.bepro_listings_tabs');
-		
-		$('ul.tabs li', $tabs_wrapper).removeClass('active');
-		$('div.panel', $tabs_wrapper).hide();
-		$('div' + $tab.attr('href')).show();
-		$tab.parent().addClass('active');
-		
-		return false;	
-	});
-	
-	$('.bepro_listings_tabs').each(function() {
-		var hash = window.location.hash;
-		if (hash.toLowerCase().indexOf("comment-") >= 0) {
-			$('ul.tabs li.reviews_tab a', $(this)).click();
-		} else {
-			$('ul.tabs li:first a', $(this)).click();
-		}
-	});
-	
-	if($("#bepro_listings_tabs")){
-		$( "#bepro_listings_tabs" ).tabs();
-	}
-	
-	map_count = 0;
-	$(".frontend_bepro_listings_vert_tabs").easyResponsiveTabs({           
-	type: 'vertical',           
-	width: 'auto',
-	fit: true,
-	activate: function(event) { 
-		if((event.target.className == "map_tab resp-tab-item resp-tab-active") && (map_count == 0)){
-			launch_frontend_map();
-			map_count++;
-		} 
-	}
-	});
+	launch_bepro_listing_tabs();
 });	
