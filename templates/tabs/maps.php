@@ -36,7 +36,20 @@ $result = $result[0][0];
 	<div class="panel entry-content" id="tab-map">
 		<div id="bpl_page_location_tab">
 			<?php 
-				$map_url = "http://maps.google.com/maps?&z=10&q=".$result->lat."+".$result->lon."+(".urlencode($result->address_line1.", ".$result->city.", ".$result->state.", ".$result->country).")&mrt=yp ";
+				//Bepro google maps old code //
+				//$map_url = "http://maps.google.com/maps?&z=10&q=".$result->lat."+".$result->lon."+(".urlencode($result->address_line1.", ".$result->city.", ".$result->state.", ".$result->country).")&mrt=yp ";
+				
+				// March 31,2016 by TS Checks if the user has entered Google Map API Key //
+				global $wpdb;
+				$data = get_option("bepro_listings");
+				
+				if($data["map_user_api"] !== '')			
+				{
+					$map_url = "http://maps.google.com/maps?&z=10&q=".$result->lat."+".$result->lon."+(".urlencode($result->address_line1.", ".$result->city.", ".$result->state.", ".$result->country).")&mrt=yp&key=".$data["map_user_api"]."";
+				}else{
+					$map_url = "http://maps.google.com/maps?&z=10&q=".$result->lat."+".$result->lon."+(".urlencode($result->address_line1.", ".$result->city.", ".$result->state.", ".$result->country).")&mrt=yp ";
+				}
+				// End Of google api map logic//
 				$address_val = ($data["protect_contact"] == "on")? "<a href='$map_url' target='_blank'>".__("View Map", "bepro-listings")."</a>" : "<ul>".(!empty($result->address_line1)? "<li>".$result->address_line1."</li>":"").(!empty($result->city)? "<li>".$result->city."</li>":"").(!empty($result->state)? "<li>".$result->state."</li>":"").(!empty($result->country)? "<li>".$result->country."</li>":"").(!empty($result->postal)? "<li>".$result->postal."</li>":"")."</ul>";
 				echo "<div class=''><h3>".__("Address", "bepro-listings")."</h3> $address_val</div>";
 			?>
