@@ -1764,6 +1764,10 @@
 						</select>	<br />
 
 						<span class="form_label"><?php _e("Use Google Map Api?", "bepro-listings"); ?></span><input type="checkbox" name="map_use_api" value="1" <?php echo (($data["map_use_api"]==1) || ($data["map_use_api"] == "on"))? 'checked="checked"':"" ?>><br />
+						
+						<!-- Added a new google map api key text box, which appears in the admin Panel -->
+						<span class="form_label"><?php _e("Map Api Key", "bepro-listings"); ?></span><input type="text" name="map_user_api" value="<?php echo $data['map_user_api'] ?>" ><br />
+						<!-- End of Google map api textbox -->
 
 						<span class="form_label"><?php _e("Map Zoom", "bepro-listings"); ?></span><select name="map_zoom">
 
