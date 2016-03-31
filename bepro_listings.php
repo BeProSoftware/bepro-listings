@@ -274,7 +274,19 @@ class Bepro_listings{
 		$block_geo = apply_filters("bepro_block_geo_search", "");
 		if(!empty($l_city) && isset($l_city) && empty($block_geo)){ 
 			//newest edits Sep, 02, 2014
-			$addresstofind = sprintf('http://maps.googleapis.com/maps/api/geocode/json?address=%s&output=csv&sensor=false',rawurlencode($l_city));
+			//$addresstofind = sprintf('http://maps.googleapis.com/maps/api/geocode/json?address=%s&output=csv&sensor=false',rawurlencode($l_city));
+			// March 31, 2016 By TS Checks if the user has entered Google Map API Key //
+			global $wpdb;
+			$data = get_option("bepro_listings");
+			if($data["map_user_api"] !== '')			
+			{
+				//newest edits Sep, 02, 2014
+				$addresstofind = sprintf('http://maps.googleapis.com/maps/api/geocode/json?address=%s&output=csv&key='.$data["map_user_api"].'',rawurlencode($l_city));
+			}else{
+				//newest edits Sep, 02, 2014
+				$addresstofind = sprintf('http://maps.googleapis.com/maps/api/geocode/json?address=%s&output=csv&sensor=false',rawurlencode($l_city));
+			}
+			// End Of google api map logic //
 			$ch = curl_init();
 			$timeout = 5; 
 			curl_setopt ($ch, CURLOPT_URL, $addresstofind);
