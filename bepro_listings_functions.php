@@ -1087,7 +1087,17 @@
 			$to_addr .= !empty($_POST['state'])? ", ".$_POST['state']:"";
 			$to_addr .= !empty($_POST['country'])? ", ".$_POST['country']:"";
 			$to_addr .= !empty($_POST['postcode'])? ", ".$_POST['postcode']:"";
-			$addresstofind_1 = "http://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($to_addr)."&sensor=false";
+			// Bepro Google map old code //
+			//$addresstofind_1 = "http://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($to_addr)."&sensor=false";
+			// March 31, 2016 By TS - Checks if the user has entered Google Map API Key //
+			if($data["map_user_api"] !== '')			
+			{
+				$addresstofind_1 = "http://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($to_addr)."&?key=".$data["map_user_api"]."";
+			}else{
+				$addresstofind_1 = "http://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($to_addr)."&sensor=false";
+			}
+			// End Of google api map logic //
+			
 			if(empty($query_type) || ($query_type == "curl")){
 				$ch = curl_init(); 
 				curl_setopt($ch, CURLOPT_URL, $addresstofind_1);
