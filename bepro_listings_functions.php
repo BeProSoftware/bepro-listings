@@ -39,7 +39,16 @@
 		);
 		
 		if(!empty($data["map_use_api"]) && !empty($data["show_geo"]))
-			wp_enqueue_script('google-maps' , '//maps.google.com/maps/api/js' , false , '3.5&sensor=false');
+			
+			// Checks if the user has entered Google Map API Key //
+			if($data["map_user_api"] !== '')
+			{
+				wp_enqueue_script('google-maps' , '//maps.google.com/maps/api/js?key='.$data["map_user_api"].'' , false , '3.5');
+			}else{
+				wp_enqueue_script('google-maps' , '//maps.google.com/maps/api/js' , false , '3.5&sensor=false');
+			}
+			// End Of google api map logic //
+			
 		$plugindir = plugins_url("bepro-listings");
 		
 		$scripts .= "\n".'<script type="text/javascript" src="'.$plugindir.'/js/bepro_listings.js"></script><script type="text/javascript" src="'.plugins_url("js/markerclusterer.js", __FILE__ ).'"></script><script type="text/javascript" src="'.plugins_url("js/easyResponsiveTabs.js", __FILE__ ).'"></script><script type="text/javascript" src="'.plugins_url("js/chosen.jquery.js", __FILE__ ).'"></script>';
