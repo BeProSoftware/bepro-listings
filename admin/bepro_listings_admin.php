@@ -716,7 +716,9 @@
 			$data["map_query_type"] = $_POST["map_query_type"];
 
 			$data["map_use_api"] = $_POST["map_use_api"];
-
+			// April 1, 2016 By TS Add User map api //			
+			$data["map_user_api"] = $_POST["map_user_api"];
+			
 			$data["map_zoom"] = $_POST["map_zoom"];
 
 			
