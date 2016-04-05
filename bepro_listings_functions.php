@@ -1101,7 +1101,7 @@
 			// March 31, 2016 By TS - Checks if the user has entered Google Map API Key //
 			if($data["map_user_api"] !== '')			
 			{
-				$addresstofind_1 = "http://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($to_addr)."&?key=".$data["map_user_api"]."";
+				$addresstofind_1 = "https://maps.googleapis.com/maps/api/geocode/json?key=".$data["map_user_api"]."&address=".urlencode($to_addr)."";
 			}else{
 				$addresstofind_1 = "http://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($to_addr)."&sensor=false";
 			}
