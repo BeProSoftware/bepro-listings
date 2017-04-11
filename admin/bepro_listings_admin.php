@@ -92,7 +92,6 @@
 			'BlTimePicker',
 
 			plugins_url("../js/jquery.ui.timepicker.js", __FILE__ ),
-
 			array('jquery', 'jquery-ui-tabs', 'jquery-effects-core'),
 
 			'',
@@ -101,9 +100,65 @@
 
 		);
 
-		echo '<link type="text/css" rel="stylesheet" href="'.plugins_url('../css/jquery-ui-1.8.18.custom.css', __FILE__ ).'" >';
-
 		if(get_post_type( get_the_ID() ) == "bepro_listings")
+			echo '<script type="text/javascript">
+							var placeSearch, autocomplete;
+				      var componentForm = {
+				        locality: "long_name",
+				        administrative_area_level_1: "long_name",
+				        country: "long_name",
+				        postal_code: "short_name"
+				      };
+
+				      function fillInAddress() {			        
+				        var place = autocomplete.getPlace();
+
+				        for (var component in componentForm) {
+				          document.getElementById(component).value = "";
+				          document.getElementById(component).disabled = false;
+				        }
+				        
+				        for (var i = 0; i < place.address_components.length; i++) {
+				          var addressType = place.address_components[i].types[0];
+				          if (componentForm[addressType]) {
+				            var val = place.address_components[i][componentForm[addressType]];
+				            document.getElementById(addressType).value = val;
+				          }
+				        }
+
+				        var geocoder = new google.maps.Geocoder();
+				        var address = document.getElementById("autocomplete").value;
+
+				        geocoder.geocode( { "address": address}, function(results, status) {
+				        if (status == google.maps.GeocoderStatus.OK) {
+				            var latitude = results[0].geometry.location.lat();
+				            var longitude = results[0].geometry.location.lng();
+				            document.getElementById("lat").value = latitude;
+				            document.getElementById("long").value = longitude;
+				          } 
+				        });
+				      }
+				      
+				      function geolocate() {
+				        if (navigator.geolocation) {
+				          navigator.geolocation.getCurrentPosition(function(position) {
+				            var geolocation = {
+				              lat: position.coords.latitude,
+				              lng: position.coords.longitude
+				            };
+				            var circle = new google.maps.Circle({
+				              center: geolocation,
+				              radius: position.coords.accuracy
+				            });
+				            autocomplete.setBounds(circle.getBounds());
+				          });
+				        }
+				      }
+						</script>';
+			$data = get_option("bepro_listings");
+			echo '<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key='.$data['map_user_api'].'&libraries=places" ></script>';
+						
+			echo '<link type="text/css" rel="stylesheet" href="'.plugins_url('../css/jquery-ui-1.8.18.custom.css', __FILE__ ).'" >';
 
 			echo '<script type="text/javascript" src="'.plugins_url('../js/bepro_listings_admin.js', __FILE__ ).'" ></script>';
 
