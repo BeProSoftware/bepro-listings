@@ -76,22 +76,15 @@ class BL_Meta_Box_Listing_Images {
 	  global $wpdb;
 	  $listing = $wpdb->get_row("SELECT * FROM ".$wpdb->prefix.BEPRO_LISTINGS_TABLE_NAME." WHERE post_id =".$post->ID);
 	  echo '
-		<span class="form_label">'.__("First Name","bepro-listings").'</span><input type="text" name="first_name" value="'.@$listing->first_name.'"><br />
-		<span class="form_label">'.__("Last Name","bepro-listings").'</span><input type="text" name="last_name" value="'.@$listing->last_name.'"><br />
-		<span class="form_label">'.__("Phone","bepro-listings").'</span><input type="text" name="phone" value="'.@$listing->phone.'"><br />
-		<span class="form_label">'.__("Email","bepro-listings").'</span><input type="text" name="email" value="'.@$listing->email.'"><br />
-		<span class="form_label">'.__("Website","bepro-listings").'</span><input type="text" name="website" value="'.@$listing->website.'"><br />
+		<span class="form_label">'.__("First Name","bepro-listings").'</span><input type="text" name="first_name" value="'.$listing->first_name.'"><br />
+		<span class="form_label">'.__("Last Name","bepro-listings").'</span><input type="text" name="last_name" value="'.$listing->last_name.'"><br />
+		<span class="form_label">'.__("Phone","bepro-listings").'</span><input type="text" name="phone" value="'.$listing->phone.'"><br />
+		<span class="form_label">'.__("Email","bepro-listings").'</span><input type="text" name="email" value="'.$listing->email.'"><br />
+		<span class="form_label">'.__("Website","bepro-listings").'</span><input type="text" name="website" value="'.$listing->website.'"><br />
 	  ';
 		$data = get_option("bepro_listings");
 		if(isset($data["require_payment"]) && ($data["require_payment"] > 0)){
-			$expires = "Order ID Required";
-			if(!empty($listing->bl_order_id) && is_numeric($listing->bl_order_id)){
-				$order = bl_get_payment_order($listing->bl_order_id);
-				if($order)
-					$expires = $order->expires;
-			}
-			echo '<span class="form_label">Expire Date</span><input class="bl_date_input" type="text" name="expires" value="'.$expires.'" disabled="disabled"><br />';
-			echo '<span class="form_label">Order ID</span><input type="text" name="bl_order_id" value="'.$listing->bl_order_id.'" placeholder="Enter numeric order ID">';
+			echo '<span class="form_label">Expire Date</span><input class="bl_date_input" type="text" name="expires" value="'.$listing->expires.'" placeholder="yyyy-mm-dd HH:mm:ss">';
 		}
 	}
 	
@@ -100,14 +93,24 @@ class BL_Meta_Box_Listing_Images {
 	  $listing = $wpdb->get_row("SELECT * FROM ".$wpdb->prefix.BEPRO_LISTINGS_TABLE_NAME." WHERE post_id =".$post->ID);
 	  
 	  echo '
-		<span class="form_label">'.__("Lat","bepro-listings").'</span><input type="test" name="lat" value="'.@$listing->lat.'"><br />
-		<span class="form_label">'.__("Lon","bepro-listings").'</span><input type="test" name="lon" value="'.@$listing->lon.'"><br />
-		<span class="form_label">'.__("Address","bepro-listings").'</span><input type="text" name="address_line1" value="'.@$listing->address_line1.'"><br />
-		<span class="form_label">'.__("City","bepro-listings").'</span><input type="text" name="city" value="'.@$listing->city.'"><br />
-		<span class="form_label">'.__("State","bepro-listings").'</span><input type="text" name="state" value="'.@$listing->state.'"><br />
-		<span class="form_label">'.__("Country","bepro-listings").'</span><input type="text" name="country" value="'.@$listing->country.'"><br />
-		<span class="form_label">'.__("Postcode","bepro-listings").'</span><input type="text" name="postcode" value="'.@$listing->postcode.'"><br />
+		<span class="form_label">'.__("Address","bepro-listings").'</span><input id="autocomplete" onFocus="geolocate()" type="text" style="width:50%" name="address_line1" value="'.$listing->address_line1.'"><br />
+		<span class="form_label">'.__("Lat","bepro-listings").'</span><input id="lat" type="text" name="lat" value="'.$listing->lat.'"><br />
+		<span class="form_label">'.__("Lon","bepro-listings").'</span><input id="long" type="text" name="lon" value="'.$listing->lon.'"><br />
+		<span class="form_label">'.__("City","bepro-listings").'</span><input type="text" id="locality" name="city" value="'.$listing->city.'"><br />
+		<span class="form_label">'.__("State","bepro-listings").'</span><input type="text" id="administrative_area_level_1" name="state" value="'.$listing->state.'"><br />
+		<span class="form_label">'.__("Country","bepro-listings").'</span><input type="text" id="country" name="country" value="'.$listing->country.'"><br />
+		<span class="form_label">'.__("Postcode","bepro-listings").'</span><input type="text" id="postal_code" name="postcode" value="'.$listing->postcode.'"><br />
 	  ';
+
+	  echo '<script>
+	  			initAutocomplete();
+	  			function initAutocomplete() {		
+			      	autocomplete = new google.maps.places.Autocomplete(
+			            (document.getElementById("autocomplete")),
+			            {types: ["geocode"]});	
+			        autocomplete.addListener("place_changed", fillInAddress);
+			    }
+	  		</script>';
 	}
 
 	/**
