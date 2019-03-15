@@ -1,0 +1,455 @@
+/*
+	This file is part of BePro Listings.
+
+    BePro Listings is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    BePro Listings is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with BePro Listings.  If not, see <http://www.gnu.org/licenses/>.
+*/	
+/* bepro listings widgets */
+.recent_listings_widget li{
+	margin-bottom:5px;
+}
+.sidebar_recent_imgs img{
+	width:25%;
+	height:25%;
+	margin-right:5px;
+}
+.ui-datepicker-header{
+	background:#000;
+	color:#fff;
+}
+.ui-datepicker .ui-state-disabled .ui-state-default{
+	background:green;
+	color: #fff;
+}
+
+/* bepro listings map */
+#secondary #map{
+	height: 250px;
+	width: 250px;
+	display: block;
+	margin: auto;		
+}#map {	background: url(../images/noResultsMap.jpg);	width:100%;}
+.result_map_1{
+	height: 120px;
+	display: block;
+	margin: auto;
+}
+.result_map_2{
+	height: 250px;
+	display: block;
+	margin: auto;
+}
+.result_map_3{
+	height: 350px;
+	display: block;
+	margin: auto;
+}
+.result_map_4{
+	height: 350px;
+	display: block;
+	margin: auto;
+}
+.marker_content:not(:first-of-type){
+	border-top:2px solid;
+	clear:both;
+}
+.marker_title{
+	clear:both;
+	display:block;
+}
+.marker_img{
+	float:left;
+}
+.marker_detais{
+	float: right;
+	width:160px;
+	word-break:break-word;
+}
+.marker_detais .addr{
+	margin-bottom:5px;
+	display:block;
+}
+.marker_links{
+	clear: right;
+	float: right;
+}
+/* listing layout */
+#shortcode_list{
+	clear:left;
+}
+.bepro_listing_desc{
+	display:block;
+	clear:left;
+	white-space: pre-line;
+}
+.bepro_listing_info div{
+    margin: 5px 0;
+    padding: 0 5px;
+}
+.bepro_listing_info{
+	display: block;
+	float: left;
+	clear: left;
+	margin: 0 0 20px 0;
+}
+.item_cost{
+	width:100%;
+	display:block;
+	clear:both;
+}
+#bpl_page_location_tab{
+	float:left;
+	width:30%;
+}
+#page_details_map_wrap{
+	width:69%;
+	float:left;
+}
+.bepro_address_info{
+	width:100%;
+	display:block;
+	clear:both;
+}
+.item_contactinfo{
+	width:100%;
+	display:block;
+	clear:both;
+}
+.bepro_listing_gallery{
+	display: block;
+}
+.single-bepro_listings h3{
+	display:block;
+	clear:left;
+}
+
+.bepro_listing_category_section{
+	clear:left;
+}
+
+
+/*Details page*/
+
+.bl_succsss_message{
+	font-weight: bold;
+	text-decoration: underline;
+	color: green;
+} 
+.bl_fail_message{
+	font-weight: bold;
+	text-decoration: underline;
+	color: red;
+} 
+.bepro_listings_tabs{
+	clear:both;
+}
+
+.bepro_listings_tabs ul.tabs {
+	list-style: none;
+	padding: 0 0 0 1em;
+	margin: 0 0 1.618em;
+	overflow: hidden;
+	position: relative;
+}
+.bepro_listings_tabs ul.tabs li.active {
+	background: #fff;
+	z-index: 2;
+	border-bottom-color: #fff;
+}
+
+.bepro_listings_tabs ul.tabs li {
+	border: 1px solid #e0dadf;
+	background: #f7f6f7;
+	background: -webkit-gradient(linear,left top,left bottom,from(#f7f6f7),to(#e0dadf));
+	background: -webkit-linear-gradient(#f7f6f7,#e0dadf);
+	background: -moz-linear-gradient(center top,#f7f6f7 0,#e0dadf 100%);
+	background: -moz-gradient(center top,#f7f6f7 0,#e0dadf 100%);
+	display: inline-block;
+	position: relative;
+	z-index: 0;
+	-webkit-border-top-left-radius: 4px;
+	-webkit-border-top-right-radius: 4px;
+	-moz-border-radius-topleft: 4px;
+	-moz-border-radius-topright: 4px;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	box-shadow: 0 3px 3px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.6);
+	margin: 0 -5px;
+	padding: 0 1em;
+}
+
+.bepro_listings_tabs ul.tabs:before {
+	position: absolute;
+	content: " ";
+	width: 100%;
+	bottom: 0;
+	left: 0;
+	border-bottom: 1px solid #e0dadf;
+	z-index: 1;
+}
+.bepro_listings_tabs ul.tabs li a {
+	display: inline-block;
+	padding: .5em 0;
+	font-weight: bold;
+	color: #5e5e5e;
+	text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+	text-decoration: none;
+}
+#tab-map{
+	height:350px;
+}	
+.bl_clear_heading{clear:left;}
+.frontend_bepro_listings_tabs #page_details_map_wrap{
+	width:70%;
+	height:350px;
+	position:absolute;
+}	
+.frontend_bepro_listings_vert_tabs #page_details_map{
+	width:100%;
+	height:300px;
+}
+.frontend_bepro_listings_tabs.ui-tabs {display:block;clear:both;width:98%;}
+.ui-tabs-vertical { width: 55em; }
+.ui-tabs-vertical .ui-tabs-nav { padding: .2em .1em .2em .2em; float: left; width: 20%; }
+.ui-tabs-vertical .ui-tabs-nav li { clear: left; width: 100%; border-bottom-width: 1px !important; border-right-width: 0 !important; margin: 0 -1px .2em 0; }
+.ui-tabs-vertical .ui-tabs-nav li a { display:block; }
+.ui-tabs-vertical .ui-tabs-nav li.ui-tabs-active { padding-bottom: 0; padding-right: .1em; border-right-width: 1px; border-right-width: 1px; }
+.ui-tabs-vertical .ui-tabs-panel { padding: 0; margin:0;float: right; width: 40em;width:70%}
+
+/* Cat Listing layout */
+.cat_lists{
+	float:left;
+	clear:both;
+	width: 100%;
+}
+.cat_list_item{
+	float:left;
+	width:185px;
+	margin-left: 10px;
+	margin-top: 10px;
+}
+.cat_list_item div{
+	float:left;
+	width:185px;
+	clear:both;
+}
+.cat_list_item img{
+	float:left;
+	width:185px;
+	height: 175px;
+	clear:both;
+}
+.cat_list_item .cat_desc{	}
+.cat_list_item .cat_head{	
+	background-color: #dfdfdf;
+	padding: 5px 5px;
+	width:175px;
+	clear:both;
+	display:block;
+}
+.cat_list_item ul{
+	clear:both;
+}
+.cat_list_item ul li{
+	list-style-type:none;
+}
+/* form layout */
+#bepro_create_listings_form input, #bepro_create_listings_form select, #bepro_create_listings_form textarea{
+	width:100%
+}
+#bepro_create_listings_form input[type="submit"],#bepro_create_listings_form hr{
+	clear:left;
+}
+#bepro_create_listings_form input[type="submit"]{
+	background-color:green;
+	color:#fff;
+	border: 0;
+    padding: 5px;
+}
+.chosen-container {
+  min-width: 150px;
+}
+#bepro_listings_package_tabs{
+	margin-bottom:10px;
+}
+.bl_package_options_table td:nth-child(2){width:36%}
+.package_option{float: left;
+width: 45%;
+border: 1px solid;
+margin-left: 5px;
+padding: 5px;}
+.form_label{
+	display:block;
+}
+
+.form_heading{
+
+	width:225px; 
+
+	margin-right:10px;
+
+	display:block;
+	
+	font-weight:bold;
+	
+	margin: 10px 0;
+	
+	text-decoration:underline;
+
+}
+.bepro_form_section{
+    margin: 5px 0;
+    padding: 10px;
+    width: 100%;
+}
+.bepro_form_cat{
+	margin:0 5px;
+	float:left;
+	height: 70px;
+	max-width:150px;
+	text-align: center;
+}
+.bepro_form_cat input[type="checkbox"]{
+	display:block;
+	margin:auto;
+}
+.label_sep{	
+    clear: both;
+    display: block;
+    font-weight: bold;
+    margin: 5px 0;
+    text-align: center;
+}
+.blsearchbuttons input[type=submit], .blsearchbuttons button{
+	height:28px;
+}
+.filter_search_form_shortcode .label_sep{	
+    clear: none;
+    float: left;
+    display: inline;
+    margin: 0 5px;
+}
+.filter_search_form_shortcode .form_label{	
+    display: inline;
+}
+.filter_search_form_shortcode div{	
+    clear: none;
+    float: left;
+    display: inline;
+    margin: 0 5px;
+	height: 40px;
+}
+.filter_search_form_shortcode select{	
+    width:auto;
+}
+.filter_search_form_shortcode{	
+    border: 1px solid #dfdfdf;
+	float: left;
+	padding: 10px;
+	width:100%;
+}
+.error{
+	display:block;
+}
+.add_listing_form_info #content{
+	width:100%;
+	margin:0;
+}
+.filter_search_form input[type=checkbox]{
+	margin:0;
+}
+.filter_search_form .searchcheckbox{
+	margin-left:5px;
+}
+.filter_search_form input[type=checkbox].sub_cat_checkbox_1{
+	margin-left:10px;
+}
+.filter_search_form input[type=checkbox].sub_cat_checkbox_2{
+	margin-left:20px;
+}
+.filter_search_form input[type=checkbox].sub_cat_checkbox_3{
+	margin-left:30px;
+}
+/* Category listings results */
+
+#listings_area h3{
+	font-size: 22px;
+	text-decoration: underline;
+}
+#listings_area .cat_lists{
+	margin:10px 0;
+	float: left;
+}
+/* buddypress */
+
+#classified_listings_table td{
+	border:1px solid #CCC; 
+}
+#classified_listings_table tr td:last-child{
+	width:24%;
+}
+#classified_listings_table{margin:10px 0}
+#bl_payment_required_table{margin:10px 0;}
+#bl_hide_bp_create_menu{
+	display:none !important;
+}
+/* Paging */
+.paging{
+	float:right;
+}
+.paging a{
+    border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    padding: 2px 4px;
+	margin: 2px 5px;
+}
+.paging a:hover,.paging a.selected{
+	background-color: grey;
+	color: #fff;
+}
+
+/*footer */
+#bepro_lisings_footer{
+	text-align: center;
+}
+
+/* general */
+.bl_shortcode_selected{
+	display:none;
+}
+
+/*Search Features*/
+@media (max-width: 576px) {
+	.blsearchbuttons, #search_filter_shortcode_button{
+		clear:both;
+		display:block;
+		margin-top:10px;
+	}
+}
+/*Search Features*/
+@media (max-width: 400px) {
+	.filter_search_form_shortcode div {
+		clear: both;
+		float: none;
+		display:block;
+	}
+	.filter_search_form_shortcode div input{
+		width:100%;
+		float:left;
+	}
+	.blsearchname{
+		display: block;
+		margin-top: 5px;
+	}
+}
