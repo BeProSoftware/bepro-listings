@@ -999,15 +999,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 		$page_id = get_the_ID();		
 		$item = $wpdb->get_row("SELECT * FROM ".$wpdb->prefix.BEPRO_LISTINGS_TABLE_NAME." WHERE post_id = ".$page_id);		
 		if( @$item->lat){			
-			// Date May 16, 2016 Checks if the user has entered Google Map API Key //
-			if($data["map_user_api"] !== '')			
-			{
-				$map_url = "http://maps.google.com/maps?&z=10&q=".$item->lat."+".$item->lon."+(".urlencode($item->address_line1.", ".$item->city.", ".$item->state.", ".$item->country).")&?key=".$data["map_user_api"]."";
-			}else{
-				
-				$map_url = "http://maps.google.com/maps?&z=10&q=".$item->lat."+".$item->lon."+(".urlencode($item->address_line1.", ".$item->city.", ".$item->state.", ".$item->country).")&mrt=yp ";
-			}
-			// End Of google api map logic by TS //			
+			$map_url = "http://maps.google.com/maps?&z=10&q=".$item->lat."+".$item->lon."+(".urlencode($item->address_line1.", ".$item->city.", ".$item->state.", ".$item->country).")&mrt=yp ";			
 			$address_val = ($data["protect_contact"] == "on")? "<a href='$map_url' target='_blank'>".__("View Map", "bepro-listings")."</a>" : bpl_format_address($item);			
 			echo "<div class='bepro_address_info'><span class='item_label'>".__("Address", "bepro-listings")."</span> - $address_val</div>";		
 		}	
