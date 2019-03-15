@@ -18,7 +18,9 @@
  if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  
 	function bepro_listings_wphead() {
+		wp_enqueue_style( "bootstrap_grid", plugins_url('css/bootstrap-grid.min.css', __FILE__ ), array(),"4.3.1", "all" );
 		wp_enqueue_style( "bepro_listings", plugins_url('css/bepro_listings.css', __FILE__ ), array(),"1.0.0", "all" );
+		wp_enqueue_style( "bepro_general", plugins_url('css/bepro_general.css', __FILE__ ), array(),"1.0.0", "all" );
 		wp_enqueue_style( "easy-responsive-tabs", plugins_url('css/easy-responsive-tabs.css', __FILE__ ), array(),"1.0.0", "all" );
 		wp_enqueue_style( "jquery-ui-1.8.18.custom", plugins_url('css/jquery-ui-1.8.18.custom.css', __FILE__ ), array(),"1.0.0", "all" );
 		wp_enqueue_style( "jquery.ui.timepicker", plugins_url("css/jquery.ui.timepicker.css", __FILE__ ), array(),"1.0.0", "all" );

@@ -84,9 +84,9 @@
 	float: right;
 }
 /* listing layout */
-#shortcode_list{
+/*#shortcode_list{
 	clear:left;
-}
+}*/
 .bepro_listing_desc{
 	display:block;
 	clear:left;
@@ -264,18 +264,18 @@
 	list-style-type:none;
 }
 /* form layout */
-#bepro_create_listings_form input, #bepro_create_listings_form select, #bepro_create_listings_form textarea{
+/*#bepro_create_listings_form input, #bepro_create_listings_form select, #bepro_create_listings_form textarea{
 	width:100%
-}
+}*/
 #bepro_create_listings_form input[type="submit"],#bepro_create_listings_form hr{
 	clear:left;
 }
-#bepro_create_listings_form input[type="submit"]{
+/*#bepro_create_listings_form input[type="submit"]{
 	background-color:green;
 	color:#fff;
 	border: 0;
     padding: 5px;
-}
+}*/
 .chosen-container {
   min-width: 150px;
 }
@@ -307,11 +307,11 @@ padding: 5px;}
 	text-decoration:underline;
 
 }
-.bepro_form_section{
+/*.bepro_form_section{
     margin: 5px 0;
     padding: 10px;
     width: 100%;
-}
+}*/
 .bepro_form_cat{
 	margin:0 5px;
 	float:left;
@@ -330,9 +330,9 @@ padding: 5px;}
     margin: 5px 0;
     text-align: center;
 }
-.blsearchbuttons input[type=submit], .blsearchbuttons button{
+/*.blsearchbuttons input[type=submit], .blsearchbuttons button{
 	height:28px;
-}
+}*/
 .filter_search_form_shortcode .label_sep{	
     clear: none;
     float: left;
@@ -361,10 +361,10 @@ padding: 5px;}
 .error{
 	display:block;
 }
-.add_listing_form_info #content{
+/*.add_listing_form_info #content{
 	width:100%;
 	margin:0;
-}
+}*/
 .filter_search_form input[type=checkbox]{
 	margin:0;
 }

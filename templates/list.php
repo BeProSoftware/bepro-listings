@@ -1,20 +1,20 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 		global $wpdb, $bp;
-
+		echo "<div class='bepro_item_listings bepro_plugin bepro_container'><div class='bepro_row'>";
 		do_action("bl_before_frontend_listings");
 		if(isset($_GET["message"]))echo "<span class='classified_message'>".$_GET["message"]."</span>";
 		echo "<h3 class='my_listings_heading'>".__("My Item Listings", "bepro-listings")."</h3>"; 
 		
 		if((@$items) && (sizeof($items) > 0)){
-			echo "<table id='classified_listings_table'><tr>
-					<td>".__("Name", "bepro-listings")."</td>
-					<td>".__("Type", "bepro-listings")."</td>
-					<td>".__("Image", "bepro-listings")."</td>
-					<td>".__("Address", "bepro-listings")."</td>
-					<td>".__("Notices", "bepro-listings")."</td>
-					<td>".__("Status", "bepro-listings")."</td>
-					<td>".__("Actions", "bepro-listings")."</td>
+			echo "<table id='classified_listings_table' class='bepro_table'><tr>
+					<th>".__("Name", "bepro-listings")."</th>
+					<th>".__("Type", "bepro-listings")."</th>
+					<th>".__("Image", "bepro-listings")."</th>
+					<th>".__("Address", "bepro-listings")."</th>
+					<th>".__("Notices", "bepro-listings")."</th>
+					<th>".__("Status", "bepro-listings")."</th>
+					<th>".__("Actions", "bepro-listings")."</th>
 				</tr>
 			";
 			//variables to check if listing has expired
@@ -79,4 +79,5 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 			}
 		}		
 		echo "</table>";
+		echo "</div></div>";
 ?>

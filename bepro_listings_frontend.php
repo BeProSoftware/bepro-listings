@@ -560,7 +560,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 		
 		//wrap results with css span
 		
-		$results = "<span class='the_search_results_only'>".$results."</span>";
+		$results = "<div class='the_search_results_only bepro_row'>".$results."</div>";
 		
 		//show paging if not featured listings and if its selected as an option
 		

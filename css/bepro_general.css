@@ -1,0 +1,261 @@
+/*
+	This file is part of BePro Listings.
+
+    BePro Listings is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    BePro Listings is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with BePro Listings.  If not, see <http://www.gnu.org/licenses/>.
+*/	
+.bepro_plugin_form {
+	background: #fafafa;
+    padding: 25px 30px 10px;
+    border: 1px solid #f1f1f1;
+    border-radius: 5px;
+}
+.bepro_plugin {
+	font-family: Arial;
+}
+.bepro_row {
+	display: inline-block;
+}
+[class^="col-md-"] {
+	float: left;
+}
+.bepro_plugin .chosen-container {
+	width: 100% !important;   
+}
+.bepro_plugin .chosen-container .chosen-choices {
+	width: 100%;
+	border-radius: 5px;
+	border: 1px solid #e1e1e1;
+	background: #fff;
+	padding: 8px 14px;
+	margin: 0 auto 20px;
+}
+.bepro_plugin .bepro_title {
+	font-size: 16px;
+	font-weight: bold;
+	margin: 0 0 20px;
+	color: #2a2f45;
+	padding: 0 0 10px;
+	border-bottom: 1px solid #eee;
+}
+.bepro_plugin input[type="text"],
+.bepro_plugin input[type="file"],
+.bepro_plugin input[type="email"],
+.bepro_plugin input[type="password"],
+.bepro_plugin textarea {
+	width: 100%;
+	border-radius: 5px;
+	border: 1px solid #e1e1e1;
+	background: #fff;
+	font-size: 14px;
+	line-height: 1.5em;
+	font-weight: normal;
+	margin: 0 auto 20px;
+	padding: 8px 14px;
+}
+.bepro_plugin .form_label {
+	font-size: 14px;
+	margin: 0 0 5px;
+	font-weight: normal;
+	display: block;
+	line-height: 1.5em;
+	color: #555;
+}
+.bepro_plugin .error {
+	font-size: 13px;
+	line-height: 1.5em;
+	font-weight: normal;
+}
+
+.bepro_plugin .bepro_table {
+	margin: 0 auto 30px;
+}
+.bepro_plugin .bepro_table a {
+	text-decoration: none;
+	color: #007acc;
+	box-shadow: 0 0 0 #333;
+}
+.bepro_plugin .bepro_table a:hover {
+	text-decoration: none;
+	color: #333;
+}
+.bepro_plugin .bepro_table {
+  font-family: inherit;
+  border-collapse: collapse;
+  width: 100%;
+}
+.bepro_plugin .bepro_table td,
+.bepro_plugin .bepro_table th {
+  border: 1px solid #ccc;
+  padding: 8px;
+  font-size: 14px;
+  line-height: 1.5em;
+}
+.bepro_plugin .bepro_table tr:nth-child(even) {
+	background-color: #fefefe;
+}
+.bepro_plugin .bepro_table tr:hover {
+	background-color: #f1f1f1;
+}
+.bepro_plugin .bepro_table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #fafafa;
+  color: #333;
+}
+
+.bepro_plugin .bepro_submit {
+	display: block;
+	padding: 10px;
+	color: #fff;
+	text-align: center;
+	font-size: 12px;
+	line-height: 1.5em;
+	border-radius: 5px;
+	margin: 0 auto 20px;
+	width: 180px;
+	background: #60af60;
+	border: 0;
+	letter-spacing: 1px;
+	font-weight: bold;
+}
+.bepro_plugin .bepro_submit:hover {
+	background: #4c894c;
+}
+.bepro_search_box {
+	display: block;
+    position: relative;
+    margin: 0;
+}
+.bepro_search_box .blsearchname,
+.bepro_search_box .blsearchwhere {
+	display: block;
+	margin: 0 auto 20px;
+}
+.bepro_search_box .blsearchbuttons {
+	display: block;
+	text-align: center;
+	margin: 0 auto 10px;
+}
+.bepro_search_box .blsearchbuttons input[type="submit"],
+.bepro_search_box .blsearchbuttons a {
+	display: inline-block;
+    padding: 10px;
+    border-radius: 5px;
+    background: #397ecc;
+    text-transform: none;
+    font-size: 14px;
+    line-height: 1.5em;
+    color: #fff;
+    font-weight: bold;
+    font-family: Arial;
+    text-align: center;
+    min-width: 160px;
+    letter-spacing: 0.5px;
+    margin: 0 5px 10px;
+    -webkit-transition: ease-in-out 0.2s;
+    -moz-transition: ease-in-out 0.2s;
+    -o-transition: ease-in-out 0.2s;
+    transition: ease-in-out 0.2s;
+}
+.bepro_search_box .blsearchbuttons input[type="submit"]:hover,
+.bepro_search_box .blsearchbuttons a:hover {
+	background: #2f67a6;
+}
+
+#shortcode_map {
+	margin: 0 auto 30px;
+    border: 1px solid rgba(0,0,0,0.3);
+    padding: 1px;
+}
+
+
+
+
+
+
+/* Start Shortcode Result v1 */
+.shortcode_results_1  {
+	border: 1px solid #eee;
+    border-radius: 5px;
+    padding: 10px 15px;
+    margin: 0 0 30px;
+    -webkit-transition: ease-in-out 0.2s;
+    -moz-transition: ease-in-out 0.2s;
+    -o-transition: ease-in-out 0.2s;
+    transition: ease-in-out 0.2s;
+}
+.shortcode_results_1:hover {
+	box-shadow: 0px 2px 4px rgba(0,0,0,0.1);
+}
+.shortcode_results_1 .result_name {
+	text-align: center;
+	font-size: 16px;
+	font-weight: bold;
+	color: #333;
+	margin: 0 auto 10px;
+	line-height: 1.5em;
+	display: block;
+}
+.shortcode_results_1 .result_button a,
+.shortcode_results_1 .result_type a,
+.shortcode_results_1 .result_name a {
+	text-decoration: none;
+	color: inherit;
+	box-shadow: 0 0 0 #fff;
+}
+.shortcode_results_1 .result_button a:hover,
+.shortcode_results_1 .result_type a:hover,
+.shortcode_results_1 .result_name a:hover {
+	color: #000;
+}
+.shortcode_results_1 .result_type {
+	font-size: 14px;
+	font-weight: normal;
+	margin: 0 auto 10px;
+	text-align: center;
+	line-height: 1.5em;
+	display: block;
+	color: #999;
+}
+.shortcode_results_1 .result_img {
+	display: block;
+	text-align: center;
+	margin: 0 auto 15px;
+}
+.shortcode_results_1 .result_img img {
+	max-width: 100%;
+	margin: auto;
+	border: 1px solid rgba(0,0,0,0.1);
+}
+.shortcode_results_1 .result_desc {
+	color: #666;
+	font-size: 13px;
+	line-height: 1.5em;
+}
+.result_button {
+	padding: 0 0 0 5px;
+	color: #007acc;
+	font-size: 13px;
+	line-height: 1.5em;
+	text-decoration: none;
+	box-shadow: 0 0 0 #fff; 
+}
+/* End Shortcode Result v1 */
+
+
+/* Responsivness */
+@media (max-width: 400px) {
+
+}

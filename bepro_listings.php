@@ -203,7 +203,7 @@ class Bepro_listings{
 			$l_type = bl_check_is_valid_cat($_REQUEST["l_type"]);
 		}
 		$return_text = '
-			<div class="search_listings bl_frontend_search_section">
+			<div class="bepro_search_box search_listings bl_frontend_search_section">
 				<form method="post" name="searchform" id="listingsearchform" action="'.$listing_page.'">
 					<input type="hidden" name="filter_search" value="1">
 					<input type="hidden" name="l_type" value="'.$l_type .'">
@@ -214,19 +214,19 @@ class Bepro_listings{
 					<input type="hidden" name="min_cost" value="'.@$_POST["min_cost"].'">
 					<input type="hidden" name="max_cost" value="'.@$_POST["max_cost"].'">';	
 		if(is_numeric($data["show_geo"]) && ($data["show_geo"] > 0))$return_text .= '
-					<span class="blsearchwhere">
+					<div class="blsearchwhere">
 						<span class="searchlabel">'.__("Where", "bepro-listings").'</span>
 						<input type="text" name="addr_search" value="'.@$_POST["addr_search"].'">
-					</span>';
+					</div>';
 		if(@$data["search_names"] != 4)$return_text .=	'
-					<span class="blsearchname">
+					<div class="blsearchname">
 						<span class="searchlabel">'.__("Name", "bepro-listings").'</span>
 						<input type="text" name="name_search" id="name_search" value="'.@$_POST["name_search"].'">
-					</span>';
-					$return_text .=	'<span class="blsearchbuttons">
+					</div>';
+					$return_text .=	'<div class="blsearchbuttons">
 					<input type="submit" value="'.__("Search Listings", "bepro-listings").'">
-										<a class="clear_search" href="'.get_bloginfo("url")."/".$listing_page.'"><button>'.__("Clear Search","bepro-listings").'</button></a>
-					</span>					
+					<a class="clear_search" href="'.get_bloginfo("url")."/".$listing_page.'">'.__("Clear Search","bepro-listings").'</a>
+					</div>					
 				</form>
 			</div>
 		';
