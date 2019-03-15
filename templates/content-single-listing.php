@@ -1,5 +1,5 @@
 <?php	
-
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 	$data = get_option("bepro_listings");	
 	$launch_tabs = apply_filters("bpl_show_page_tabs", false);	
 	if(($data["show_content"] == 1) || ($data["show_geo"] == 1) || ($data["show_comments"] == 1) || ($data["show_details"] == 1) || $launch_tabs){		
@@ -17,4 +17,6 @@
 	do_action("bepro_listings_item_content_info");	
 	do_action("bepro_listings_item_end");
 
+	if(!empty($data["analytics_code"]))
+		echo stripslashes($data["analytics_code"]);
 ?>

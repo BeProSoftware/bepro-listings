@@ -1,9 +1,10 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 		global $wpdb, $bp;
 
 		do_action("bl_before_frontend_listings");
 		if(isset($_GET["message"]))echo "<span class='classified_message'>".$_GET["message"]."</span>";
-		echo "<h3>".__("My Item Listings", "bepro-listings")."</h3>"; 
+		echo "<h3 class='my_listings_heading'>".__("My Item Listings", "bepro-listings")."</h3>"; 
 		
 		if((@$items) && (sizeof($items) > 0)){
 			echo "<table id='classified_listings_table'><tr>
@@ -16,11 +17,14 @@
 					<td>".__("Actions", "bepro-listings")."</td>
 				</tr>
 			";
+			//variables to check if listing has expired
+			$date = new DateTime(@$item->expires);
+			$now = new DateTime();
 			
 			foreach($items as $item){
 				$notice = __("None","bepro-listings");
 				$post_status = (($item->post_status == "publish")? __("Published","bepro-listings"):__("Pending","bepro-listings"));
-				$order_status = $item->order_status;
+				$order_status = @$item->order_status;
 				
 				if(!empty($data["require_payment"]) && ($post_status == "Published")){
 					if(@$item->order_status && ($item->order_status!= 1)){
@@ -49,7 +53,10 @@
 						<td>".$post_status."</td>
 						<td>";
 						
-						if($post_status == "Published"){ 
+						
+						if(!empty($item->bl_order_id) && ($post_status == "publish") && !empty($data["require_payment"]) && ($date < $now)){
+							echo __("Pay","bepro-listings");
+						}else if($post_status == "Published"){ 
 							echo "<a href='".get_permalink($item->post_id)."' target='_blank'>".__("View", "bepro-listings")."</a>";
 						}else if((@$order_status) && ($order_status != 1)){
 							echo __("Pay","bepro-listings");

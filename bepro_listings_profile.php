@@ -1,5 +1,5 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 	function bl_my_listings(){
 		global $wpdb, $post;
 		$current_url =  get_permalink( $post->ID );
@@ -28,9 +28,10 @@
 		
 		$types = listing_types();
 		$current_user = wp_get_current_user();
-		$user_id = $current_user->id;
+		$user_id = $current_user->ID;
 		
 		if(isset($_POST["save_bepro_listing"]) && !empty($_POST["save_bepro_listing"])){
+			check_ajax_referer( 'frontend_form', "bpl_form_nonce");
 			$success = false;
 			$success = bepro_listings_save();
 			if($success){
@@ -65,7 +66,7 @@
 			}
 			
 			$listing_url = "?bl_manage=1&bl_id=";
-			$add_listing_button = "<p><a href='".$listing_url."'>".__("Add a Listing")."</a></p>";
+			$add_listing_button = "<p><a href='".$listing_url."'>".__("Add a Listing","bepro-listings")."</a></p>";
 			
 			//allow addons to override create listing button
 			$return_text .= apply_filters("bl_change_add_listing_button", $add_listing_button, $listing_url);
@@ -124,13 +125,13 @@
 
 		//get settings
 		$data = get_option("bepro_listings");
-		$default_user_id = $data["default_user_id"];
-		$num_images = $data["num_images"];
-		$validate = $data["validate_form"];
-		$show_cost = $data["show_cost"];
-		$show_con = $data["show_con"];
-		$show_geo = $data["show_geo"];
-		$cat_drop = $data["cat_drop"];
+		$default_user_id = @$data["default_user_id"];
+		$num_images = @$data["num_images"];
+		$validate = @$data["validate_form"];
+		$show_cost = @$data["show_cost"];
+		$show_con = @$data["show_con"];
+		$show_geo = @$data["show_geo"];
+		$cat_drop = @$data["cat_drop"];
 		
 		$listing_url = "?bl_manage=1&bl_id=";
 		$url = get_permalink( $post->ID );

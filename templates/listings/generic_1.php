@@ -1,3 +1,7 @@
+<?php
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+?>
+
 <div class="shortcode_results_1 <?php echo empty($data["show_imgs"])? "no_img":""; ?>">
 <?php
 	do_action( 'bepro_listings_list_above_title', $result, $data );

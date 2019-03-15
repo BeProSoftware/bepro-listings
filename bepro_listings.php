@@ -4,7 +4,7 @@ Plugin Name: BePro Listings
 Plugin Script: bepro_listings.php
 Plugin URI: http://www.beprosoftware.com/shop
 Description: Best way to search front end submissions. Use optional base features like Galleries, payments & google maps. Ideal for various websites including Business directories, Classifieds, Product Catalogs, Portfolios & more. Put this shortcode [bl_all_in_one] in any page or post. Visit website for more
-Version: 2.2.0017
+Version: 2.2.0040
 License: GPL V3
 Author: BePro Software Team
 Author URI: http://www.beprosoftware.com
@@ -73,10 +73,10 @@ class Bepro_listings{
 		add_action("manage_posts_custom_column",  "bepro_listings_custom_columns");
 		add_action( "plugins_loaded",  "bepro_listings_setup_category");
 		add_action( 'bp_init', array( $this, "start_bp_addon") );
+		add_action( 'bepro_listing_form_start', 'add_nonce_to_form' );
 		
 		//ajax
 		add_action( 'wp_ajax_bepro_ajax_delete_post', 'bepro_ajax_delete_post' );
-		add_action( 'wp_ajax_nopriv_bepro_ajax_delete_post', 'bepro_ajax_delete_post' );
 		add_action( 'wp_ajax_bl_ajax_result_page', 'bl_ajax_result_page' );
 		add_action( 'wp_ajax_nopriv_bl_ajax_result_page', 'bl_ajax_result_page' );
 		add_action( 'wp_ajax_bl_ajax_frontend_update', 'bl_ajax_frontend_update' );
@@ -89,6 +89,7 @@ class Bepro_listings{
 		add_action( 'wp_ajax_nopriv_bl_update_demo_options', 'bl_update_demo_options' );
 		add_action( 'wp_ajax_bl_update_demo_labels', 'bl_update_demo_labels' );
 		add_action( 'wp_ajax_nopriv_bl_update_demo_labels', 'bl_update_demo_labels' );
+		
 		
 		//wpmu
 		add_action( 'wpmu_new_blog', 'bepro_new_blog', 10, 6);   
@@ -172,6 +173,10 @@ class Bepro_listings{
 		add_filter('wpmu_drop_tables', 'bepro_delete_blog' );
 		add_filter('plugin_action_links_'. plugin_basename(__FILE__), 'bepro_listings_add_settings_link');
 		
+		// Experimental
+		
+		add_filter("bepro_listings_add_to_clause", "bepro_search_wild_splice");
+		
 		//shortcodes
 		add_shortcode("search_form", array( $this, "searchform"));
 		add_shortcode("filter_form", array( $this, "search_filter_options"));
@@ -189,8 +194,8 @@ class Bepro_listings{
 	function searchform($atts = array(), $echo_this=false){
 		global $wpdb;
 		extract(shortcode_atts(array(
-			  'listing_page' => $wpdb->escape($_POST["listing_page"]),
-			  'l_type' => $wpdb->escape($_POST["l_type"])
+			  'listing_page' => esc_sql(@$_POST["listing_page"]),
+			  'l_type' => esc_sql(@$_POST["l_type"])
 		 ), $atts));
 		
 		$data = get_option("bepro_listings");
@@ -202,21 +207,21 @@ class Bepro_listings{
 				<form method="post" name="searchform" id="listingsearchform" action="'.$listing_page.'">
 					<input type="hidden" name="filter_search" value="1">
 					<input type="hidden" name="l_type" value="'.$l_type .'">
-					<input type="hidden" name="distance" value="'.$_POST["distance"].'">
-					<input type="hidden" name="min_date" value="'.$_POST["min_date"].'">
-					<input type="hidden" name="max_date" value="'.$_POST["max_date"].'">
+					<input type="hidden" name="distance" value="'.@$_POST["distance"].'">
+					<input type="hidden" name="min_date" value="'.@$_POST["min_date"].'">
+					<input type="hidden" name="max_date" value="'.@$_POST["max_date"].'">
 					<input type="hidden" name="listing_page" value="'.$listing_page.'">
-					<input type="hidden" name="min_cost" value="'.$_POST["min_cost"].'">
-					<input type="hidden" name="max_cost" value="'.$_POST["max_cost"].'">';	
+					<input type="hidden" name="min_cost" value="'.@$_POST["min_cost"].'">
+					<input type="hidden" name="max_cost" value="'.@$_POST["max_cost"].'">';	
 		if(is_numeric($data["show_geo"]) && ($data["show_geo"] > 0))$return_text .= '
 					<span class="blsearchwhere">
 						<span class="searchlabel">'.__("Where", "bepro-listings").'</span>
-						<input type="text" name="addr_search" value="'.$_POST["addr_search"].'">
+						<input type="text" name="addr_search" value="'.@$_POST["addr_search"].'">
 					</span>';
 		if(@$data["search_names"] != 4)$return_text .=	'
 					<span class="blsearchname">
 						<span class="searchlabel">'.__("Name", "bepro-listings").'</span>
-						<input type="text" name="name_search" id="name_search" value="'.$_POST["name_search"].'">
+						<input type="text" name="name_search" id="name_search" value="'.@$_POST["name_search"].'">
 					</span>';
 					$return_text .=	'<span class="blsearchbuttons">
 					<input type="submit" value="'.__("Search Listings", "bepro-listings").'">
@@ -236,14 +241,15 @@ class Bepro_listings{
 	function listitems($atts) {
 		global $wpdb;
 		extract(shortcode_atts(array(
-			  'l_type' => $wpdb->escape($_REQUEST["l_type"]),
-			  'min_cost' => $wpdb->escape($_REQUEST["min_cost"]),
-			  'max_cost' => $wpdb->escape($_REQUEST["max_cost"]),
-			  'min_date' => $wpdb->escape($_REQUEST["min_date"]),
-			  'max_date' => $wpdb->escape($_REQUEST["max_date"]),
-			  'l_name' => $wpdb->escape($_REQUEST["name_search"]),
-			  'l_city' => $wpdb->escape($_REQUEST["addr_search"]),
-			  'wp_site' => $wpdb->escape($_POST["wp_site"]),
+			  'l_type' => esc_sql($_REQUEST["l_type"]),
+			  'min_cost' => esc_sql($_REQUEST["min_cost"]),
+			  'max_cost' => esc_sql($_REQUEST["max_cost"]),
+			  'min_date' => esc_sql($_REQUEST["min_date"]),
+			  'max_date' => esc_sql($_REQUEST["max_date"]),
+			  'l_name' => esc_sql($_REQUEST["name_search"]),
+			  'l_featured' => esc_sql($_REQUEST["l_featured"]),
+			  'l_city' => esc_sql($_REQUEST["addr_search"]),
+			  'wp_site' => esc_sql($_POST["wp_site"]),
 		 ), $atts));
 		 
 		 $data = get_option("bepro_listings");
@@ -260,6 +266,13 @@ class Bepro_listings{
 			unset($_SESSION["addr_search"]);
 		 }
 		 
+		if(!empty($l_featured)){
+			unset($_SESSION["name_search"]);
+			unset($_SESSION["addr_search"]);
+			$l_name = "";
+			$l_city = "";
+		}
+		 
 		//Query Bepro Listing Types
 		$returncaluse = "";
 		if(!empty($l_type) && is_numeric($l_type)){
@@ -267,6 +280,15 @@ class Bepro_listings{
 		}else if(!empty($l_type) && is_array($l_type)){
 			$a_l_type = implode(",", $l_type);
 			$returncaluse  .= "AND t.term_id IN ($a_l_type)";
+		 }else if(!empty($l_type) && strpos($l_type,",")){
+			$a_l_types = explode(",", $l_type); 
+			$check_numericy = true;
+			foreach($a_l_types as $a_l_type)
+				if(!is_numeric($a_l_type))
+					$check_numericy = false;
+			
+			if($check_numericy)
+				$returncaluse  .= "AND t.term_id IN ($l_type)";
 		 }	 
 		
 		//Query google for lat/lon of users requested address
@@ -274,27 +296,21 @@ class Bepro_listings{
 		$block_geo = apply_filters("bepro_block_geo_search", "");
 		if(!empty($l_city) && isset($l_city) && empty($block_geo)){ 
 			//newest edits Sep, 02, 2014
-			//$addresstofind = sprintf('http://maps.googleapis.com/maps/api/geocode/json?address=%s&output=csv&sensor=false',rawurlencode($l_city));
 			// March 31, 2016 By TS Checks if the user has entered Google Map API Key //
-			global $wpdb;
-			$data = get_option("bepro_listings");
-			if($data["map_user_api"] !== '')			
-			{
-				//newest edits Sep, 02, 2014
-				$addresstofind = sprintf('http://maps.googleapis.com/maps/api/geocode/json?address=%s&output=csv&key='.$data["map_user_api"].'',rawurlencode($l_city));
-			}else{
-				//newest edits Sep, 02, 2014
-				$addresstofind = sprintf('http://maps.googleapis.com/maps/api/geocode/json?address=%s&output=csv&sensor=false',rawurlencode($l_city));
-			}
-			// End Of google api map logic //
+ 			if($data["map_geocode_api"] !== '')			
+ 			{
+ 				$addresstofind = sprintf('https://maps.googleapis.com/maps/api/geocode/json?address=%s&output=csv&key='.$data["map_geocode_api"].'',rawurlencode($l_city));
+ 			}else{
+ 				$addresstofind = sprintf('https://maps.googleapis.com/maps/api/geocode/json?address=%s&output=csv&sensor=false',rawurlencode($l_city));
+ 			}
+			
 			$ch = curl_init();
 			$timeout = 5; 
 			curl_setopt ($ch, CURLOPT_URL, $addresstofind);
 			curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
 			curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
 			$_result = curl_exec($ch);
-			curl_close($ch);
-			
+			curl_close($ch); 
 			$_result = json_decode($_result);
 			$currentlat = (string)$_result->results[0]->geometry->location->lat; 
 			$currentlon = (string)$_result->results[0]->geometry->location->lng;
@@ -367,8 +383,8 @@ class Bepro_listings{
 	function search_filter_options($atts = array(), $echo_this = false){
 		global $wpdb;
 		extract(shortcode_atts(array(
-			 'bl_form_id' => $wpdb->escape($_POST["bl_form_id"]),
-			 'listing_page' => $wpdb->escape($_POST["listing_page"])
+			 'bl_form_id' => esc_sql($_POST["bl_form_id"]),
+			 'listing_page' => esc_sql($_POST["listing_page"])
 		 ), $atts));
 		
 		if(empty($atts["bl_form_id"]))$atts["bl_form_id"] = $_POST["bl_form_id"];

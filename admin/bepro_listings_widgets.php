@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with BePro Listings.  If not, see <http://www.gnu.org/licenses/>.
 */	
-
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 class BL_Search_Filter_Widget extends WP_Widget {
 
 	function BL_Search_Filter_Widget() {

@@ -1,7 +1,7 @@
 BePro Listings
 ==============
 
-BePro Listings is a Wordpress plugin and available themes for creating, Directory, Classifieds, and other listing sites. This plugin comes with, google maps, ajax search / filter, and lots more. This is the newest, most feature rich, and best supported listings plugin on wordpress.
+BePro Listings is a set of WordPress plugin and themes for creating, Directory, Classifieds, and other listing sites. This plugin comes with, google maps, ajax search / filter, and lots more. This is the newest, most feature rich, and best supported listings plugin on wordpress.
 
 DOCUMENTATION
 
@@ -32,6 +32,7 @@ BePro Listings has also spawned the famous $1 one dollar wordpress themes. Check
 2. FolioProjects - Responsive Child theme for the stock wordpress twentyfourteen teamplate. Perfect for gallery, portfolio, and other sites where you want to emphasize the featured images. Comes with three templates
 3. MT Classifieds - Great responsive theme for classified focused websites. Template uses various features including (google map, categories, and listings)
 4. WhatLocalsCallIt - Great responsive directory theme built on the twentytwelve foundation. Great option for a Product catalogue
+5. BePro Business Directory - Premium directory theme with several Home, Search, Blog and other templates
 
 FORUMS
 

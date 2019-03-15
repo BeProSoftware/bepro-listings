@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with BePro Listings.  If not, see <http://www.gnu.org/licenses/>.
 */	
-
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 	//ajax update front end
 	function bl_ajax_frontend_update(){
 		$_REQUEST["l_type"] = (!empty($_REQUEST["l_type"]) && !is_numeric($_REQUEST["l_type"]) && !is_array($_REQUEST["l_type"]))? explode(",", $_REQUEST["l_type"]):$_REQUEST["l_type"];
@@ -99,7 +99,7 @@
 		
 		$return_text = "";
 		extract(shortcode_atts(array(
-			  'l_type' => $wpdb->escape($_REQUEST["l_type"])
+			  'l_type' => esc_sql(@$_REQUEST["l_type"])
 		 ), $atts));
 		 
 		if($l_type == "a1"){ 
@@ -141,17 +141,18 @@
 		global $wpdb;
 		
 		extract(shortcode_atts(array(
-			  'pop_up' => $wpdb->escape($_POST["pop_up"]),
-			  'size' => $wpdb->escape($_POST["size"]),
-			  'l_type' => $wpdb->escape($_REQUEST["l_type"]),
-			  'show_paging' => $wpdb->escape($_POST["show_paging"]),
-			  'map_id' => $wpdb->escape($_POST["map_id"]),
-			  'limit' => $wpdb->escape($_REQUEST["limit"]),
-			  'bl_form_id' => $wpdb->escape($_REQUEST["bl_form_id"]),
-			  'bl_post_id' => $wpdb->escape($_POST["bl_post_id"])
+			  'pop_up' => esc_sql(@$_POST["pop_up"]),
+			  'size' => esc_sql(@$_POST["size"]),
+			  'l_type' => esc_sql(@$_REQUEST["l_type"]),
+			  'show_paging' => esc_sql(@$_POST["show_paging"]),
+			  'map_id' => esc_sql(@$_POST["map_id"]),
+			  'limit' => esc_sql(@$_REQUEST["limit"]),
+			  'bl_form_id' => esc_sql(@$_REQUEST["bl_form_id"]),
+			  'bl_post_id' => esc_sql(@$_POST["bl_post_id"])
 		 ), $atts));
 		 
-		 
+		$map_cities = "";
+		
 		//form builder integration
 		$_REQUEST["bl_form_id"] = $bl_form_id;
 		 
@@ -178,9 +179,9 @@
 				$currlat = $result->lat;
 				$currlon = $result->lon;
 				if($pop_up){
-					$map_cities .= bepro_listings_detailed_infowindow($result, $counter);
+					$map_cities .= bepro_listings_detailed_infowindow($raw_results, $currlat, $currlon, $counter);
 				}else{
-					$map_cities .= bepro_listings_simple_infowindow($result, $counter);
+					$map_cities .= bepro_listings_simple_infowindow($raw_results, $currlat, $currlon, $counter);
 				}
 			}
 			$counter++;
@@ -211,7 +212,7 @@
 				$map_cities
 				//cluster markers
 				if(markers.length > 1){
-					var markerCluster = new MarkerClusterer(map, markers);
+					var markerCluster = new MarkerClusterer(map, markers, {maxZoom: 13,zoomOnClick: true});
 					//makes sure map view fits all markers
 					 latlngbounds = new google.maps.LatLngBounds();
 					for ( var i = 0; i < positions.length; i++ ) {
@@ -237,11 +238,29 @@
 		return $vars;
 	}
 	
-	function bepro_listings_simple_infowindow($result, $counter){
-		$permalink = get_permalink( $result->post_id );
+	function bepro_listings_simple_infowindow($results, $currlat, $currlon, $counter){
 		$data = get_option("bepro_listings");
 		$target = empty($data["link_new_page"])? 1:$data["link_new_page"];
+		$marker_content = "";
+		//find all markers with the exact same location
+		//$result = "";
+		foreach($results as $result){
+			if(($result->lat == $currlat)&&($result->lon == $currlon))
+				$marker_content .= "<div class=\"marker_content\"><span class=\"marker_detais\">'.addslashes($result->post_title).'</span></div>";
+		}
 		
+		$return_txt = 'var infowindow_'.$counter.' = new google.maps.InfoWindow( { content: '.$marker_content.', size: new google.maps.Size(50,50)});
+				  google.maps.event.addListener(marker_'.$counter.', "mouseover", function() {
+					if(openwindow){
+						eval(openwindow).close();
+					}
+					infowindow_'.$counter.'.open(map,marker_'.$counter.');
+					openwindow = infowindow_'.$counter.';
+				  });';
+				 
+
+		//figure out link
+		$permalink = get_permalink( $result->post_id );
 		if($target == 2){
 			$link = 'var win=window.open("'.$permalink.'", "_blank"); win.focus();';
 		}elseif($target == 3){
@@ -250,16 +269,7 @@
 			$link = '';	
 		}else{
 			$link = 'window.location.href = "'.$permalink.'"';
-		}
-		
-		$return_txt = 'var infowindow_'.$counter.' = new google.maps.InfoWindow( { content: "<div class=\"marker_content\"><span class=\"marker_detais\">'.addslashes($result->post_title).'</span></div>", size: new google.maps.Size(50,50)});
-				  google.maps.event.addListener(marker_'.$counter.', "mouseover", function() {
-					if(openwindow){
-						eval(openwindow).close();
-					}
-					infowindow_'.$counter.'.open(map,marker_'.$counter.');
-					openwindow = infowindow_'.$counter.';
-				  });';
+		}		  
 				  
 		if(!empty($link))
 			$return_txt = '
@@ -271,23 +281,34 @@
 		return $return_txt;
 	}
 	
-	function bepro_listings_detailed_infowindow($result, $counter){
-		$thumbnail = get_the_post_thumbnail($result->post_id, 'thumbnail'); 
+	function bepro_listings_detailed_infowindow($results, $currlat, $currlon, $counter){
 		$data = get_option("bepro_listings");
 		$target = empty($data["link_new_page"])? 1:$data["link_new_page"];
-		$default_img = (!empty($thumbnail))? $thumbnail:'<img src="'.$data["default_image"].'"/>';
-		if($target == 2){
-			$link = "<a href=\"http://".urlencode($result->website)."\" target=\"_blank\">".__("Visit Website","bepro-listings")."</a>";
-		}elseif($target == 3){
-			$link =  "<a href=\"http://".urlencode($result->website)."\" class='bl_ajax_result_page' post_id=\"".$result->post_id."\">Visit Website</a>";
-		}elseif($target == 5){
-			$link = "";
-		}else{
-			$link ="<a href=\"http://".urlencode($result->website)."\" post_id=\"".$bp_listing->post_id."\">Visit Website</a>";
+		$marker_content = "";
+		
+		foreach($results as $result){
+			if(($result->lat == $currlat)&&($result->lon == $currlon)){
+				$thumbnail = get_the_post_thumbnail($result->post_id, 'thumbnail'); 
+				$default_img = (!empty($thumbnail))? $thumbnail:'<img src="'.$data["default_image"].'"/>';
+				
+				if($target == 2){
+					$link = "<a href=\"http://".urlencode($result->website)."\" target=\"_blank\">".__("Visit Website","bepro-listings")."</a>";
+				}elseif($target == 3){
+					$link =  "<a href=\"http://".urlencode($result->website)."\" class='bl_ajax_result_page' post_id=\"".$result->post_id."\">Visit Website</a>";
+				}elseif($target == 5){
+					$link = "";
+				}else{
+					$link ="<a href=\"http://".urlencode($result->website)."\" post_id=\"".$result->post_id."\">Visit Website</a>";
+				}
+				
+				$format_address = bpl_format_address($result);
+				
+				$marker_content .= "<div class=\"marker_content\"><span class=\"marker_title\">".addslashes(substr($result->post_title,0,18))."</span><span class=\"marker_img\">".$default_img."</span><span class=\"marker_detais\"><span class=\"addr\">".$format_address."</span><span class=\"cont\">".substr($result->post_content,0,55)."</span></span>".(empty($link)?"":"<span class=\"marker_links\">".$link."<br /><a href=\"".get_permalink($result->post_id)."\">".__("View Listing","bepro-listings")."</a></span>")."</div>";
+			}
 		}
 		
-		$format_address = bpl_format_address($result);
-		return "var infowindow_".$counter." = new google.maps.InfoWindow( { content: '<div class=\"marker_content\"><span class=\"marker_title\">".addslashes(substr($result->post_title,0,18))."</span><span class=\"marker_img\">".$default_img."</span><span class=\"marker_detais\">".$format_address."</span>".(empty($link)?"":"<span class=\"marker_links\">".$link."<br /><a href=\"".get_permalink($result->post_id)."\">".__("View Listing","bepro-listings")."</a></span>")."</div>', size: new google.maps.Size(50,50)});
+		
+		return "var infowindow_".$counter." = new google.maps.InfoWindow( { content: '".$marker_content."', size: new google.maps.Size(50,50)});
 				  google.maps.event.addListener(marker_".$counter.", \"click\", function() {
 					if(openwindow){
 						eval(openwindow).close();
@@ -299,13 +320,13 @@
 	}
 	
 	function bepro_listings_generate_map_marker($var, $result, $counter){
-		return 'position = new google.maps.LatLng('.$result->lat.','.$result->lon.');
+		return 'position = new google.maps.LatLng('.@$result->lat.','.@$result->lon.');
 					var marker_'.$counter.' = new google.maps.Marker({
 						position: position,
 						icon:icon_1,
 						map: map,
 						clickable: true,
-						title: "'.$result->item_name.'",
+						title: "'.@$result->item_name.'",
 					});
 					
 					markers.push(marker_'.$counter.');
@@ -323,11 +344,12 @@
 		$data = get_option("bepro_listings");
 		$no_img = plugins_url("images/no_img.jpg", __FILE__ );
 		extract(shortcode_atts(array(
-			  'url_input' => $wpdb->escape($_POST["url"]),
-			  'ctype' => $wpdb->escape($_POST["ctype"]),
-			  'cat' => $wpdb->escape($_POST["cat"])
+			  'url_input' => esc_sql(@$_POST["url"]),
+			  'ctype' => esc_sql(@$_POST["ctype"]),
+			  'cat' => esc_sql(@$_POST["cat"])
 		 ), $atts));
 		
+		if(!@$_REQUEST["l_type"])$_REQUEST["l_type"] = "";
 		
 		$cat_heading = (!empty($_REQUEST["l_type"]) && (is_numeric($_REQUEST["l_type"]) || is_array($_REQUEST["l_type"])))? $data["cat_empty"]:$data["cat_heading"];
 		
@@ -440,22 +462,29 @@
 	//Show listings Called from shortcode or ajax. type is the template to use. l_type is the category to filter by.
 	function display_listings($atts = array(), $echo_this = false){
 		global $wpdb;
+
 		extract(shortcode_atts(array(
-			  'type' => $wpdb->escape($_POST["type"]),
-			  'l_type' => $wpdb->escape($_REQUEST["l_type"]),
-			  'ex_type' => $wpdb->escape($_REQUEST["ex_type"]),
-			  'l_featured' => $wpdb->escape($_POST["l_featured"]),
-			  'order_dir' => $wpdb->escape($_POST["order_dir"]),
-			  'order_by' => $wpdb->escape($_POST["order_by"]),
-			  'l_ids' => $wpdb->escape($_REQUEST["l_ids"]),
-			  'limit' => $wpdb->escape($_REQUEST["limit"]),
-			  'bl_form_id' => $wpdb->escape($_REQUEST["bl_form_id"]),
-			  'show_paging' => $wpdb->escape($_POST["show_paging"])
+			  'type' => esc_sql(@$_POST["type"]),
+			  'l_type' => esc_sql(@$_REQUEST["l_type"]),
+			  'ex_type' => esc_sql(@$_REQUEST["ex_type"]),
+			  'l_featured' => esc_sql(@$_POST["l_featured"]),
+			  'order_dir' => esc_sql(@$_POST["order_dir"]),
+			  'order_by' => esc_sql(@$_POST["order_by"]),
+			  'l_ids' => esc_sql(@$_REQUEST["l_ids"]),
+			  'limit' => esc_sql(@$_REQUEST["limit"]),
+			  'bl_form_id' => esc_sql(@$_REQUEST["bl_form_id"]),
+			  'bpl_state' => esc_sql(@$_REQUEST["bpl_state"]),
+			  'no_filter' => esc_sql(@$_REQUEST["no_filter"]),
+			  'show_paging' => esc_sql(@$_POST["show_paging"])
 		 ), $atts));
 		 
 		//form builder and origami integration
 		$_REQUEST["bl_form_id"] = $bl_form_id;
 		$_POST["l_featured"] = $l_featured;
+		
+		//experiment
+		$_REQUEST["bpl_state"] = $bpl_state;
+		
 		
 		$data = get_option("bepro_listings");
 		$num_results = (empty($limit)|| !is_numeric($limit))? $data["num_listings"]:$limit; 
@@ -474,12 +503,23 @@
 		
 		
 		//make presumption to randomize featured listings
-		if(empty($order_by) && !empty($l_featured))$order_by = 2;
+		if(empty($order_by) && !empty($l_featured)){
+			$order_by = 2;
+		}else if(empty($order_by)){
+			$order_by = 1;
+		}
 		if(empty($order_dir))$order_dir = 1;
 		
-		$findings = process_listings_results($show_paging, $num_results, $l_type, $l_ids, $order_by,$order_dir);				
+		$findings = process_listings_results($show_paging, $num_results, $l_type, $l_ids, $order_by,$order_dir,$l_featured);				
 		$raw_results = $findings[0];				
-			
+		
+		//define variables		
+		$results = "";	
+		$hidden_limit_text = "";
+		$show_bl_type = "";
+		$bl_form_id_div  = "";
+		$l_featured_id = "";
+		
 		//Create the GUI layout for the listings
 		if(empty($raw_results) || is_null($raw_results)){
 			$results = "<p>".__("your criteria returned no results.")."</p>";
@@ -514,9 +554,13 @@
 			$results .= @(is_numeric($check) || ($check == $type))? "":$check;
 			
 			foreach($list_templates as $key => $val){
-				remove_action($key, $val, 2);
+				remove_action($key, $val, 10, 2);
 			}
 		}
+		
+		//wrap results with css span
+		
+		$results = "<span class='the_search_results_only'>".$results."</span>";
 		
 		//show paging if not featured listings and if its selected as an option
 		
@@ -524,7 +568,7 @@
 			$pages = 0;
 			$pages = $findings[1];
 			$counter = 1;
-			$paging = "<div style='clear:both'><br /></div><div class='paging'>Pages: ";
+			$paging = "<div style='clear:both'><br /></div><div class='paging'><span>Pages:</span> ";
 			
 			//if ajax is off, we need to carry forward some of the filter vars shown in the address bar
 			$get_vars = "";
@@ -551,19 +595,26 @@
 				$show_paging = "<div id='bl_show_paging' class='bl_shortcode_selected'>0</div>";
 		}
 		
+		$bl_total_results = "";
+		
 		if(!empty($l_featured)){
 			$l_featured_id = "_featured";
+			if(@$findings[2])
+				$bl_total_results = "<div id='bl_total_results_featured' class='bl_shortcode_selected'>".$findings[2]."</div>";
 		}else{
 			$show_bl_type = "<div id='bl_type' class='bl_shortcode_selected'>$type</div>";
 			$hidden_limit_text = "<div id='bl_limit' class='bl_shortcode_selected'>$limit</div>";
+			if(@$findings[2])
+				$bl_total_results = "<div id='bl_total_results' class='bl_shortcode_selected'>".$findings[2]."</div>";
 		}
+		
 		
 		$bl_order_dir = "";
 		if(is_numeric($order_dir))
 			$bl_order_dir = "<div id='bl_order_dir' class='bl_shortcode_selected'>$order_dir</div>";
 		
 		$bl_order_by = "";
-		if(is_numeric($order_by))
+		if(is_numeric($order_by) && empty($l_featured))
 			$bl_order_by = "<div id='bl_order_by' class='bl_shortcode_selected'>$order_by</div>";
 		
 		
@@ -577,8 +628,14 @@
 			$bl_l_type = "<div id='bl_l_type' class='bl_shortcode_selected'>".$l_type."</div>";
 		}
 		
+		//Reset featured BST edit
+		$_POST["l_featured"] = "";
+		$l_featured = "";
+		$order_by = "";
+		$order_dir = "";
+		
 		$results = "<div id='shortcode_list$l_featured_id' class='bl_frontend_search_section result_type_".$type."'>".$results."</div>";
-		$results .= "$hidden_limit_text $show_bl_type $show_paging $bl_order_dir $bl_order_by $bl_form_id_div $bl_l_type";
+		$results .= "$hidden_limit_text $show_bl_type $show_paging $bl_order_dir $bl_order_by $bl_form_id_div $bl_l_type $bl_total_results";
 		if($echo_this){
 			echo $results;
 		}else{	
@@ -587,15 +644,17 @@
 	}
 	
 	//process paging and listings
-	function process_listings_results($show_paging = false, $num_results = false, $l_type = false, $l_ids = false, $order_by = 1, $order_dir = 1){
+	function process_listings_results($show_paging = false, $num_results = false, $l_type = false, $l_ids = false, $order_by = 1, $order_dir = 1, $l_featured = ""){
 		global $wpdb;
 		
+		$returncaluse = "";
+		$filter_cat = "";
 		if(!empty($_REQUEST["filter_search"]) || !empty($l_type)){
 			
 			if(is_array($l_type) && @isset($l_type[0]) && ($l_type[0]==0)){
 				$l_type ="";
 			}	
-			$returncaluse = Bepro_listings::listitems(array('l_type' => $l_type));
+			$returncaluse = @Bepro_listings::listitems(array('l_type' => $l_type,'l_featured' => $l_featured));
 			$filter_cat = true;
 		}	
 		if(!empty($l_ids)){
@@ -621,6 +680,7 @@
 			$resvs = bepro_get_listings($returncaluse, $filter_cat);
 			$pages = ceil(count($resvs)/$num_results);
 			$findings[1] = $pages;
+			$findings[2] = count($resvs);
 			$raw_results = bepro_get_listings($returncaluse, $filter_cat, $limit_clause);
 
 		$findings[0] = $raw_results;
@@ -652,8 +712,8 @@
 	function search_filter_shortcode($atts = array(), $echo_this = false){
 		global $wpdb;
 		extract(shortcode_atts(array(
-			  'listing_page' => $wpdb->escape($_POST["listing_page"]),
-			  'l_type' => $wpdb->escape($_POST["l_type"])
+			  'listing_page' => esc_sql(@$_POST["listing_page"]),
+			  'l_type' => esc_sql(@$_POST["l_type"])
 		 ), $atts));
 		
 		//get settings
@@ -663,8 +723,8 @@
 
 		$search_form = "<div class='filter_search_form_shortcode'>
 			<form id='filter_search_shortcode_form' method='post' action='".$listing_page."'>
-				<input type='hidden' name='name_search' value='".$_POST["name_search"]."'>
-				<input type='hidden' name='addr_search' value='".$_POST["addr_search"]."'>
+				<input type='hidden' name='name_search' value='".@$_POST["name_search"]."'>
+				<input type='hidden' name='addr_search' value='".@$_POST["addr_search"]."'>
 				<input type='hidden' name='filter_search' value='1'>";
 				
 		$search_form_fields = apply_filters("bepro_listings_search_filter_shortcode_override",$atts);
@@ -672,7 +732,7 @@
 			$search_form .= $search_form_fields;
 		}else{
 			$search_form .= "
-				<div>
+				<div class='bl_category_search_option'>
 						<span class='searchlabel'>".__($data["cat_heading"], "bepro-listings")."</span>
 						";
 			if($l_type){	
@@ -708,24 +768,24 @@
 			///////////////////////////////////////////////////////////////////////
 			$dist_measurement = (@$data["dist_measurement"] && ($data["dist_measurement"]==2))? "Km":"Mi";
 			if(is_numeric($data["show_geo"]) && ($data["show_geo"] != 0))	
-			$search_form .= "<div class='bl_distance_search_option'>".__("Distance", "bepro-listings").': <select name="distance">
+			$search_form .= "<div class='bl_distance_search_option'><span class='searchlabel'>".__("Distance", "bepro-listings").':</span> <select name="distance">
 						<option value="">'.__("None","bepro-listings").'</option>
-						<option value="10" '.(($_POST["distance"] == 10)||((empty($_POST["distance"])) && $data["distance"] == 10)? 'selected="selected"':"").'>10 '.$dist_measurement.'</option>
-						<option value="50" '.(($_POST["distance"] == 50)||((empty($_POST["distance"])) && $data["distance"] == 50)? 'selected="selected"':"").'>50 '.$dist_measurement.'</option>
-						<option value="150" '.((($_POST["distance"] == 150) || ((empty($_POST["distance"])) && $data["distance"] == 150))? 'selected="selected"':"").'>150 '.$dist_measurement.'</option>
-						<option value="250" '.(($_POST["distance"] == 250)||((empty($_POST["distance"])) && $data["distance"] == 250)? 'selected="selected"':"").'>250 '.$dist_measurement.'</option>
-						<option value="500" '.(($_POST["distance"] == 500)||((empty($_POST["distance"])) && $data["distance"] == 500)? 'selected="selected"':"").'>500 '.$dist_measurement.'</option>
-						<option value="1000" '.(($_POST["distance"] == 1000)||((empty($_POST["distance"])) && $data["distance"] == 1000)? 'selected="selected"':"").'>1000 '.$dist_measurement.'</option>
+						<option value="10" '.((@$_POST["distance"] == 10)||((empty($_POST["distance"])) && $data["distance"] == 10)? 'selected="selected"':"").'>10 '.$dist_measurement.'</option>
+						<option value="50" '.((@$_POST["distance"] == 50)||((empty($_POST["distance"])) && $data["distance"] == 50)? 'selected="selected"':"").'>50 '.$dist_measurement.'</option>
+						<option value="150" '.(((@$_POST["distance"] == 150) || ((empty($_POST["distance"])) && $data["distance"] == 150))? 'selected="selected"':"").'>150 '.$dist_measurement.'</option>
+						<option value="250" '.((@$_POST["distance"] == 250)||((empty($_POST["distance"])) && $data["distance"] == 250)? 'selected="selected"':"").'>250 '.$dist_measurement.'</option>
+						<option value="500" '.((@$_POST["distance"] == 500)||((empty($_POST["distance"])) && $data["distance"] == 500)? 'selected="selected"':"").'>500 '.$dist_measurement.'</option>
+						<option value="1000" '.((@$_POST["distance"] == 1000)||((empty($_POST["distance"])) && $data["distance"] == 1000)? 'selected="selected"':"").'>1000 '.$dist_measurement.'</option>
 					</select></div>';
 				
 				//min/max cost
 				if(($data["show_cost"] == 1) || ($data["show_cost"] =="on"))
 				$search_form .= '
-					<div><span class="label_sep">'.__("Price Range", "bepro-listings").'</span><span class="form_label">'.__("From", "bepro-listings").'</span><input class="input_text" type="text" name="min_cost" value="'.$_POST["min_cost"].'"><span class="form_label">'.__("To", "bepro-listings").'</span><input class="input_text" type="text" name="max_cost" value="'.$_POST["max_cost"].'"></div>';
+					<div><span class="label_sep">'.__("Price Range", "bepro-listings").'</span><span class="form_label"></span><input class="input_text" type="text" name="min_cost" value="'.@$_POST["min_cost"].'" placeholder="'.__("From", "bepro-listings").'"><span class="form_label"> </span><input class="input_text" type="text" name="max_cost" value="'.@$_POST["max_cost"].'" placeholder="'.__("To", "bepro-listings").'"></div>';
 				
 				if(($data["show_date"] == 1) || ($data["show_date"] =="on"))
 				$search_form .= '
-					<div><span class="label_sep">'.__("Date Range", "bepro-listings").'</span><span class="form_label">'.__("From", "bepro-listings").'</span><input class="input_text" type="text" name="min_date" id="min_date" value="'.$_POST["min_date"].'"><span class="form_label">'.__("To", "bepro-listings").'</span><input class="input_text" type="text" name="max_date" id="max_date" value="'.$_POST["max_date"].'"></div>';
+					<div><span class="label_sep">'.__("Date Range", "bepro-listings").'</span><span class="form_label"></span><input class="input_text" type="text" name="min_date" id="min_date" value="'.@$_POST["min_date"].'" placeholder="'.__("From", "bepro-listings").'"><span class="form_label"> </span><input class="input_text" type="text" name="max_date" id="max_date" value="'.@$_POST["max_date"].'" placeholder="'.__("To", "bepro-listings").'"></div>';
 				
 				$search_form .= apply_filters("bepro_listings_search_filter_shortcode","", $atts);
 		}
@@ -829,18 +889,7 @@
 	}
 	function bepro_listings_list_geo_template($bp_listing, $data){
 		if($data["show_geo"])
-			echo '<span class="result_title"><span class="bl_list_addr_element">'.$bp_listing->address_line1.", </span>";
-			
-			if(!empty($bp_listing->city)) 
-				echo '<span class="bl_list_addr_element">'.$bp_listing->city.', </span>';
-				
-			if(!empty($bp_listing->state)) 
-				echo '<span class="bl_list_addr_element">'.$bp_listing->state.', </span>';
-			
-			if(!empty($bp_listing->country))
-				echo '<span class="bl_list_addr_element">'.$bp_listing->country.'</span>';
-			
-			echo '</span>';
+			echo '<span class="result_title">'.bpl_format_address($bp_listing).'</span>';
 	}
 	function bepro_listings_list_content_template($bp_listing, $data){
 		$desc_length = empty($data["desc_length"])? 80:$data["desc_length"];
@@ -967,6 +1016,7 @@
 		//get settings
 		$data = get_option("bepro_listings");
 		$add_detail_links = empty($data["add_detail_links"])? false:true;
+		$num_cols = !empty($data["bpl_details_cols"])? $data["bpl_details_cols"]:2;
 		if(is_numeric($item->cost)){
 			//formats the price to have comas and dollar sign like currency.
 			$cost = ($item->cost == 0)? __("Free", "bepro-listings") : $data["currency_sign"].sprintf('%01.2f', $item->cost);
@@ -975,7 +1025,7 @@
 		}
 		
 		if((!empty($data["show_cost"])) || (!empty($data["show_con"]))){
-			echo "<span class='bepro_listing_info'><h3>".__("Details", "bepro-listings")." </h3>";
+			echo "<span class='bepro_listing_info'><h3>".__("Details", "bepro-listings")." </h3><div id='bpl_details_cols' style='column-count: ".$num_cols.";-moz-column-count: ".$num_cols.";-webkit-column-count: ".$num_cols.";'>";
 			if(is_numeric($data["show_cost"]) || ($data["show_cost"] == "on")){
 				echo "<div class='item_cost'>".__(apply_filters("bl_cost_listing_label","Cost"), "bepro-listings")." - ".apply_filters("bl_cost_listing_value",$cost)."</div>";
 			}	
@@ -1016,7 +1066,7 @@
 							".$website."
 						</div>";
 				}
-			echo "</span>";
+			echo "</div></span>";
 		}
 		
 	}
@@ -1032,10 +1082,10 @@
 		global $wpdb;
 		
 		extract(shortcode_atts(array(
-			  'bl_form_id' => $wpdb->escape($_POST["bl_form_id"]),
-			  'origami' => $wpdb->escape($_POST["origami"]),
-			  'register' => $wpdb->escape($_POST["register"]),
-			  'redirect' => $wpdb->escape($_POST["redirect"])
+			  'bl_form_id' => esc_sql(@$_POST["bl_form_id"]),
+			  'origami' => esc_sql(@$_POST["origami"]),
+			  'register' => esc_sql(@$_POST["register"]),
+			  'redirect' => esc_sql(@$_POST["redirect"])
 		 ), $atts));
 		
 		//addon tie ins
@@ -1051,6 +1101,7 @@
 		$show_cost = $data["show_cost"];
 		$show_con = $data["show_con"];
 		$show_geo = $data["show_geo"];
+		$listing_saved = false;
 		
 		if(empty($default_user_id) && empty($register)){
 			echo __("You must provide a 'default user id' in the admin settings or use the registration=1 option.","bepro-listings");	
@@ -1060,6 +1111,7 @@
 		if(!empty($_POST["save_bepro_listing"])){
 			$wp_upload_dir = wp_upload_dir();
 			if(bepro_listings_save()){
+				$listing_saved = true;
 				if(!empty($_POST["redirect"])){
 					header("LOCATION: ".get_bloginfo("url").$_POST["redirect"]);
 					exit;
@@ -1073,10 +1125,18 @@
 		}
 		ob_start();
 		
+		$item = new stdClass();
+		$post_data  = new stdClass();
+		$thunmbnails  = "";
+		
 		$frontend_form = dirname( __FILE__ )."/templates/form.php";
 		$frontend_form = apply_filters("bl_change_upload_form", $frontend_form);
-		if($frontend_form)
-		include($frontend_form);
+
+		if($frontend_form && $frontend_form != "This form has no fields!")
+			include($frontend_form);
+		if($frontend_form == "This form has no fields!")
+			echo "Form Error!";
+		
 		$results = ob_get_contents();
 		ob_end_clean();	
 		
@@ -1205,6 +1265,8 @@
 	function get_form_cats($cats, $exclude = array(), $required = array(), $categories = array(), $multiple = true){
 		$data = get_option("bepro_listings");
 		$required_hidden = ""; // disable required and use hidden select to send to backend
+		$normal_list = "";
+		$required_list = "";
 		foreach($cats as $cat){
 			if(!empty($exclude) && in_array($cat->term_id, array_values($exclude))){
 			

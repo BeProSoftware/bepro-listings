@@ -9,7 +9,7 @@
  * @version     2.0.0
  */
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
-get_header("listings"); ?>
+ ?>
 <div class="entry">
 		<?php
 		global $wpdb, $post;
@@ -18,12 +18,11 @@ get_header("listings"); ?>
 		$item = $wpdb->get_row("SELECT * FROM ".$wpdb->prefix.BEPRO_LISTINGS_TABLE_NAME." WHERE post_id = ".$page_id);
 		//get settings
 		$data = get_option("bepro_listings");
-		?>
-		
-		<?php while ( have_posts() ) : the_post(); ?>
-		
-		<?php
 		if($item){
+			$launch_tabs = apply_filters("bpl_show_page_tabs", false);
+			if(($data["show_content"] == 1) || ($data["show_geo"] == 1) || ($data["show_comments"] == 1) || $launch_tabs){
+				add_action("bepro_listings_item_details", "bepro_listings_item_tabs");
+			}
 			$page_template = "";
 			$page_template = apply_filters("bepro_listings_change_page_template",$page_template,$item);
 			if(empty($page_template))
@@ -31,11 +30,6 @@ get_header("listings"); ?>
 			include($page_template); 
 		}else{
 			the_content();
-		}		
+		}
 		?>
-
-		<?php endwhile; // end of the loop. ?>
 </div>
-
-<?php get_sidebar("listings"); ?>
-<?php get_footer("listings"); ?>

@@ -1,5 +1,5 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  
     function display_item_list() {
 		add_action( 'bp_template_content', 'display_item_content' );

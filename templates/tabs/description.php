@@ -5,7 +5,7 @@
  * @author 		BePro Listings
  * @package 	bepro_listings/Templates
  */
-
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 global $post;
 
 if ( $post->post_content ) : ?>

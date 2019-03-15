@@ -1,7 +1,7 @@
-﻿body {
+﻿.resp-tabs-body {
     margin: 0px;
     padding: 0px;
-    background: #f5f5f5;
+    background: rgba(0,0,0,0.2);
     font-family: 'Segoe UI';
 }
 ul.resp-tabs-list, p {

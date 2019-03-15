@@ -32,7 +32,7 @@
 
 */	
 
-
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 	function bepro_admin_init(){
 
@@ -635,7 +635,7 @@
 
 			$data["default_user_id"] = $_POST["default_user_id"];
 
-			$data["use_tiny_mce"] = $_POST["use_tiny_mce"];
+			$data["use_tiny_mce"] = @$_POST["use_tiny_mce"];
 
 			$data["default_status"] = $_POST["default_status"];
 
@@ -661,15 +661,15 @@
 
 			//search listings
 
-			$data["default_image"] = $_POST["default_image"];
+			$data["default_image"] = @$_POST["default_image"];
 
 			$data["link_new_page"] = $_POST["link_new_page"];
 
-			$data["ajax_on"] = $_POST["ajax_on"];
+			$data["ajax_on"] = @$_POST["ajax_on"];
 
-			$data["num_listings"] = $_POST["num_listings"];
+			$data["num_listings"] = @$_POST["num_listings"];
 
-			$data["distance"] = $_POST["distance"];
+			$data["distance"] = @$_POST["distance"];
 			
 			$data["dist_measurement"] = $_POST["dist_measurement"];
 
@@ -679,67 +679,69 @@
 			
 			$data["desc_length"] = is_numeric($_POST["desc_length"])?$_POST["desc_length"]:$data["desc_length"];
 
-			$data["details_link"] = $_POST["details_link"];
+			$data["details_link"] = @$_POST["details_link"];
 
-			$data["show_web_link"] = $_POST["show_web_link"];
+			$data["show_web_link"] = @$_POST["show_web_link"];
 
-			$data["show_date"] = $_POST["show_date"];
+			$data["show_date"] = @$_POST["show_date"];
 
-			$data["currency_sign"] = $_POST["currency_sign"];
+			$data["currency_sign"] = @$_POST["currency_sign"];
 
 			
 
 			//Page/post
 
-			$data["gallery_size"] = $_POST["gallery_size"];
+			$data["gallery_size"] = @$_POST["gallery_size"];
 
-			$data["gallery_cols"] = $_POST["gallery_cols"];
+			$data["gallery_cols"] = @$_POST["gallery_cols"];
 
-			$data["page_template"] = $_POST["page_template"];
+			$data["page_template"] = @$_POST["page_template"];
 
-			$data["show_details"] = $_POST["show_details"];
+			$data["show_details"] = @$_POST["show_details"];
 
-			$data["add_detail_links"] = $_POST["add_detail_links"];
+			$data["add_detail_links"] = @$_POST["add_detail_links"];
 
-			$data["protect_contact"] = $_POST["protect_contact"];
+			$data["protect_contact"] = @$_POST["protect_contact"];
 
-			$data["show_content"] = $_POST["show_content"];
+			$data["show_content"] = @$_POST["show_content"];
 
-			$data["show_comments"] = $_POST["show_comments"];
+			$data["show_comments"] = @$_POST["show_comments"];
 
-			$data["tabs_type"] = $_POST["tabs_type"];
+			$data["tabs_type"] = @$_POST["tabs_type"];
 
 			
 
 			//map
 
-			$data["map_query_type"] = $_POST["map_query_type"];
+			$data["map_query_type"] = @$_POST["map_query_type"];
 
-			$data["map_use_api"] = $_POST["map_use_api"];
+			$data["map_use_api"] = @$_POST["map_use_api"];
 			// April 1, 2016 By TS Add User map api //			
-			$data["map_user_api"] = $_POST["map_user_api"];
-			
-			$data["map_zoom"] = $_POST["map_zoom"];
+ 			$data["map_user_api"] = @$_POST["map_user_api"];
+			// Feb 2, 2019 By BST since geocdoe api needs unique config compared to javascript api aka map_user_api //
+ 			$data["map_geocode_api"] = @$_POST["map_geocode_api"];
+			$data["map_zoom"] = @$_POST["map_zoom"];
 
 			
 
 			//3rd party
 
-			$data["buddypress"] = $_POST["buddypress"];
+			$data["buddypress"] = @$_POST["buddypress"];
+			$data["analytics_code"] = @$_POST["analytics_code"];
 
 			
 
 			//payment
 
-			$data["require_payment"] = $_POST["require_payment"];
+			$data["require_payment"] = @$_POST["require_payment"];
 
-			$data["cat_fee_duration"] = $_POST["cat_fee_duration"];
+			$data["cat_fee_duration"] = @$_POST["cat_fee_duration"];
 
 			$fee_count = 1;
 
-			$data["add_to_cart"] = $_POST["add_to_cart"];
+			$data["add_to_cart"] = @$_POST["add_to_cart"];
 
-			$data["publish_after_payment"] = $_POST["publish_after_payment"];
+			$data["publish_after_payment"] = @$_POST["publish_after_payment"];
 
 			
 
@@ -761,7 +763,7 @@
 
 			//Support
 
-			$data["footer_link"] = $_POST["footer_link"];
+			$data["footer_link"] = @$_POST["footer_link"];
 
 			
 
@@ -1605,6 +1607,13 @@
 
 						<span class="form_label"><?php _e("Exclude Categories", "bepro-listings"); ?></span><input type="text" name="bepro_listings_cat_exclude" value="<?php echo $data["bepro_listings_cat_exclude"]; ?>" /></br>
 
+						<span class="form_label"><?php _e("# of Columns", "bepro-listings"); ?></span><select name="bpl_form_cols">
+
+							<option value="1" <?php echo (@$data["bpl_form_cols"] == 1)? 'selected="selected"':"" ?>><?php _e("Check box", "bepro-listings"); ?></option>
+
+							<option value="2" <?php echo (@$data["bpl_form_cols"] == 2)? 'selected="selected"':"" ?>><?php _e("Select box", "bepro-listings"); ?></option>
+
+						</select></br>
 					</div>
 
 					<div id="tabs-3">
@@ -1745,6 +1754,13 @@
 
 						<span class="form_label"><?php _e("Show Comments", "bepro-listings"); ?></span><select name="show_comments"><option value="0" <?php echo ($data["show_comments"]== 0)? 'selected="selected"':"" ?>><?php echo __("No","bepro-listings"); ?></option><option value="1" <?php echo ($data["show_comments"]==1)? 'selected="selected"':"" ?>><?php echo __("In Tab","bepro-listings"); ?></option><option value="2" <?php echo ($data["show_comments"]==2)? 'selected="selected"':"" ?>><?php echo __("In Page","bepro-listings"); ?></option></select><br />
 
+						<span class="form_label"><?php _e("# of Details Cols", "bepro-listings"); ?></span><select name="bpl_details_cols">
+
+							<option value="1" <?php echo (@$data["bpl_details_cols"] == 1)? 'selected="selected"':""; ?>>1</option>
+
+							<option value="2" <?php echo (@$data["bpl_details_cols"] == 2)? 'selected="selected"':""; ?>>2</option>
+
+						</select>
 						<span class="form_label"><?php _e("Tab Direction", "bepro-listings"); ?></span><select name="tabs_type">
 
 							<option value="1" <?php echo ($data["tabs_type"] == 1)? 'selected="selected"':""; ?>>Vertical</option>
@@ -1766,7 +1782,13 @@
 						</select>	<br />
 
 						<span class="form_label"><?php _e("Use Google Map Api?", "bepro-listings"); ?></span><input type="checkbox" name="map_use_api" value="1" <?php echo (($data["map_use_api"]==1) || ($data["map_use_api"] == "on"))? 'checked="checked"':"" ?>><br />
+						<!-- Added a new google map api key text box, which appears in the admin Panel -->
+ 						<span class="form_label"><?php _e("Map Javasctipt Api Key", "bepro-listings"); ?></span><input type="text" name="map_user_api" value="<?php echo $data['map_user_api'] ?>" ><br />
+ 						<!-- End of Google map api textbox -->
+  
+ 						<span class="form_label"><?php _e("Map Geocode Api Key", "bepro-listings"); ?></span><input type="text" name="map_geocode_api" value="<?php echo $data['map_geocode_api'] ?>" ><br />
 
+  
 						<span class="form_label"><?php _e("Map Zoom", "bepro-listings"); ?></span><select name="map_zoom">
 
 							<option value="0" <?php echo ($data["map_zoom"] == "1")? 'selected="selected"':""; ?>>0</option>
@@ -1815,7 +1837,8 @@
 
 					<div id="tabs-6">
 
-						<span class="form_label"><?php _e("Buddypress", "bepro-listings"); ?></span><input type="checkbox" name="buddypress" <?php echo ($data["buddypress"]== (1 || "on"))? 'checked="checked"':"" ?>>
+						<span class="form_label"><?php _e("Buddypress", "bepro-listings"); ?></span><input type="checkbox" name="buddypress" <?php echo ($data["buddypress"]== (1 || "on"))? 'checked="checked"':"" ?>><br />
+						<span class="form_label"><?php _e("Analytics", "bepro-listings"); ?></span><textarea rows="10" cols="35" name="analytics_code"> <?php echo stripslashes($data["analytics_code"]); ?> </textarea>
 
 					</div>
 
@@ -2007,7 +2030,7 @@
 				<thead><tr><td colspan='2'>".__("BePro Listings","bepro-listings")."</td></tr></thead>
 				<tr><td>".__("Database Tables","bepro-listings")."</td><td>".($wpdb->get_var("SHOW TABLES LIKE '$table_name'")!=$table_name? "<span class='bpl_error'>".__("ERROR","bepro-listings")."</span>":"OK")."</td></tr>
 				<tr><td>".__("File Path","bepro-listings")."</td><td>".$plugin_url."</td></tr>
-				<tr><td>".__("Google API","bepro-listings")."</td><td>".$lat_lon["status"]."</td></tr>
+				<tr><td>".__("Google API","bepro-listings")."</td><td>".$lat_lon["status"].(@$lat_lon["error_message"]? " - ".$lat_lon["error_message"]:"")."</td></tr>
 				<tr><td>".__("Result Templates","bepro-listings")."</td><td>".(empty($data["bepro_listings_list_template_1"])? "<span class='bpl_error'>".__("ERROR","bepro-listings")."</span>":"OK")."</td></tr>
 			</table>
 			<table class='bpl_status_display_table'>
@@ -2301,7 +2324,7 @@
 					<span class='shortcode_label'>Exclude Categories</span><input type='text' name='ex_type' placeholder='e.g. 13,34,55,22'/>
 
 					<span class='shortcode_label'>Required Categories</span><input type='text' name='l_type' placeholder='e.g. 13,34,55,22'/>
-
+					
 				</form>
 
 			</div>

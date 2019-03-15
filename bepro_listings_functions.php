@@ -15,11 +15,15 @@
     You should have received a copy of the GNU General Public License
     along with BePro Listings.  If not, see <http://www.gnu.org/licenses/>.
 */	
+ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  
 	function bepro_listings_wphead() {
-		echo '<link type="text/css" rel="stylesheet" href="'.plugins_url('css/bepro_listings.css', __FILE__ ).'" ><link type="text/css" rel="stylesheet" href="'.plugins_url('css/easy-responsive-tabs.css', __FILE__ ).'" ><link type="text/css" rel="stylesheet" href="'.plugins_url('css/jquery-ui-1.8.18.custom.css', __FILE__ ).'" ><meta name="generator" content="BePro Listings '.BEPRO_LISTINGS_VERSION.'">
-		<link rel="stylesheet" href="'.plugins_url("css/jquery.ui.timepicker.css", __FILE__ ).'" /><link rel="stylesheet" href="'.plugins_url("css/chosen.css", __FILE__ ).'" />
-		';
+		wp_enqueue_style( "bepro_listings", plugins_url('css/bepro_listings.css', __FILE__ ), array(),"1.0.0", "all" );
+		wp_enqueue_style( "easy-responsive-tabs", plugins_url('css/easy-responsive-tabs.css', __FILE__ ), array(),"1.0.0", "all" );
+		wp_enqueue_style( "jquery-ui-1.8.18.custom", plugins_url('css/jquery-ui-1.8.18.custom.css', __FILE__ ), array(),"1.0.0", "all" );
+		wp_enqueue_style( "jquery.ui.timepicker", plugins_url("css/jquery.ui.timepicker.css", __FILE__ ), array(),"1.0.0", "all" );
+		wp_enqueue_style( "chosen", plugins_url("css/chosen.css", __FILE__ ), array(),"1.0.0", "all" );
+		echo '<meta name="generator" content="BePro Listings '.BEPRO_LISTINGS_VERSION.'">';
 	} 
 
 	function bepro_listings_javascript() {
@@ -39,11 +43,22 @@
 		);
 		
 		if(!empty($data["map_use_api"]) && !empty($data["show_geo"]))
-			wp_enqueue_script('google-maps' , '//maps.google.com/maps/api/js' , false , '3.5&sensor=false');
+			// Checks if the user has entered Google Map API Key //
+ 			if(@$data["map_user_api"] !== '')
+ 			{
+ 				wp_enqueue_script('google-maps' , '//maps.google.com/maps/api/js?key='.@$data["map_user_api"].'' , false , '3.5');
+ 			}else{
+ 				wp_enqueue_script('google-maps' , '//maps.google.com/maps/api/js' , false , '3.5&sensor=false');
+ 			}
+			
 		$plugindir = plugins_url("bepro-listings");
 		
-		$scripts .= "\n".'<script type="text/javascript" src="'.$plugindir.'/js/bepro_listings.js"></script><script type="text/javascript" src="'.plugins_url("js/markerclusterer.js", __FILE__ ).'"></script><script type="text/javascript" src="'.plugins_url("js/easyResponsiveTabs.js", __FILE__ ).'"></script><script type="text/javascript" src="'.plugins_url("js/chosen.jquery.js", __FILE__ ).'"></script>';
 		
+		wp_enqueue_script( 'bepro_listings', $plugindir.'/js/bepro_listings.js', array(), '1.0.0', true );
+		wp_enqueue_script( 'markerclusterer', $plugindir.'/js/markerclusterer.js', array(), '1.0.0', true );
+		wp_enqueue_script( 'easyResponsiveTabs', $plugindir.'/js/easyResponsiveTabs.js', array(), '1.0.0', true );
+		wp_enqueue_script( 'chosen_jquery', $plugindir.'/js/chosen.jquery.js', array(), '1.0.0', true );
+		$nonce = wp_create_nonce( "process-delete-listings" );
 		$scripts .= '
 		<script type="text/javascript">
 			if(!ajaxurl)	
@@ -65,12 +80,12 @@
 				jQuery(".delete_link").click(function(element){
 					element.preventDefault();
 					tr_element = jQuery(this).parent().parent();
-					
+					nonce = "'.$nonce.'";
 					file = jQuery(this)[0].id;
 					file = file.split("::");
 					check = confirm("'.__("are you sure you want to delete","bepro-listings").' " +file[2]+ "?");
 					if(check){
-						jQuery.post(ajaxurl, { "action":"bepro_ajax_delete_post", post_id:file[1] }, function(i, message) {
+						jQuery.post(ajaxurl, { "action":"bepro_ajax_delete_post", post_id:file[1], nonce:nonce }, function(i, message) {
 						   var obj = jQuery.parseJSON(i);
 						   alert(obj["status"]);
 						   if(obj["status"] == "'.__("Deleted Successfully!","bepro-listings").'")
@@ -100,6 +115,9 @@
 				if((event.target.className == "map_tab resp-tab-item resp-tab-active") && (map_count == 0)){
 					launch_frontend_map();
 					map_count++;
+				}else if((event.target.className == "resp-accordion resp-tab-active") && (map_count == 0)){
+					launch_frontend_map();
+					map_count++;
 				} 
 			}
 			});
@@ -114,11 +132,11 @@
 
 	
 	function bepro_listings_menus() {
-		add_submenu_page('edit.php?post_type=bepro_listings', 'Option', 'Options', 4, 'bepro_listings_options', 'bepro_listings_options');
+		add_submenu_page('edit.php?post_type=bepro_listings', 'Option', 'Options', "edit_posts", 'bepro_listings_options', 'bepro_listings_options');
 		$num_admin_menus = 0;
 		$num_menus = apply_filters("bepro_listings_num_admin_menus", $num_admin_menus);
 		if($num_menus > 0)
-			add_submenu_page('edit.php?post_type=bepro_listings', 'AddOns', 'AddOns', 5, 'bepro_listings_addons', 'bepro_listings_addons');
+			add_submenu_page('edit.php?post_type=bepro_listings', 'AddOns', 'AddOns', "manage_options", 'bepro_listings_addons', 'bepro_listings_addons');
 			
 		add_submenu_page('edit.php?post_type=bepro_listings', 'BPL Status', 'BPL Status', "manage_options", 'bepro_listings_status', 'bepro_listings_status');
 	}
@@ -199,15 +217,19 @@
 			
 			$post = array(
 				  'post_author' => $user_id,
-				  'post_content' => "<p>This is your first listing. Delete this one in your admin and create one of your own. If you need help, our <a href='http://www.beprosoftware.com/services/'>Wordpress Development</a> team can help. Also note we have tons of <a href='beprosoftware.com/products/bepro-listings'>Wordpress Directory Plugins</a> and <a href='beprosoftware.com/products/bepro-listings'>Wordpress Directory Themes</a> for this plugin like: </p>
+				  'post_content' => "<p>This is your first listing. Delete this one in your admin and create one of your own. If you need help, our <a href='https://www.beprosoftware.com/services/'>Wordpress Development</a> team can help. Also note we have lots of <a href='https://www.beprosoftware.com/products/bepro-listings/'>Wordpress Directory Plugins and themes</a> available for this plugin like: </p>
 				  <ul>
 					<li><a href='https://www.beprosoftware.com/shop/bepro-listings-form-builder/'>Form Builder</a> - Use the drag and drop interface to create multiple front end upload forms and listing types</li>
-					<li><a href='https://www.beprosoftware.com/shop/bepro-listings-claim/'>Claim Listings</a> - Monetize your directory and allow users to claim listings</li>
+					<li><a href='https://www.beprosoftware.com/shop/bepro-listings-galleries/'>Gallery</a> - Three 3 gallery options including slider &amp; lightbox, plus three new listings templates</li>
+					<li><a href='https://www.beprosoftware.com/shop/bepro-listings-videos/'>Video</a> - Improve on the Gallery plugin with the ability to add and feature videos in your listings from website like youtube and uploaded documents (mp4, mpeg, avi, wmv, webm, etc)</li>
+					<li><a href='https://www.beprosoftware.com/shop/bepro-listings-search/'>Search</a> - Add predictive google maps address lookup and auto complete enhancements to the basic search feature</li>
+					<li><a href='https://www.beprosoftware.com/shop/bepro-software-api/'>Api</a> - Turn your website into a 24/7 remote content manager. Ideal for integration with other data feeds</li>
+					<li><a href='https://www.beprosoftware.com/shop/bepro-listings-export/'>Export</a> - Export search results from BePro Lisitngs, great for your accountant to review</li>
+					<li><a href='https://www.beprosoftware.com/shop/bepro-listings-claim/'>Claim Listings</a> - More Monetization options for your directory by allowing users to claim listings</li>
+					<li><a href='https://www.beprosoftware.com/shop/bepro-listings-bookings/'>Bookings</a>  - Setup your availability and allow users to schedule time. Perfect for real estate, vehicle, hotel, and other niche sites</li>
 					<li><a href='https://www.beprosoftware.com/shop/bepro-listings-recaptcha/'>reCAPTCHA</a> - Reduce spam and malicious submissions with a captcha system powered by google</li>
 					<li><a href='https://www.beprosoftware.com/shop/bepro-listings-tags/'>Tags</a> - This was definitely an achilles heel for this plugin. Now you and your members can tag your listings and allow users to search them via the tag widget</li>
 					<li><a href='https://www.beprosoftware.com/shop/bepro-listings-contact/'>Contact</a> - Add a contact form to your listing pages. This provides the option to have all emails go to one address or the address for the person who created the listing</li>
-					<li><a href='https://www.beprosoftware.com/shop/bepro-listings-galleries/'>Gallery</a> - Three 3 gallery options including slider &amp; lightbox, plus three new listings templates</li>
-					<li><a href='https://www.beprosoftware.com/shop/bepro-listings-videos/'>Video</a> - Improve on the Gallery plugin with the ability to add and feature videos in your listings from website like youtube and uploaded documents (mp4, mpeg, avi, wmv, webm, etc)</li>
 					<li><a href='https://www.beprosoftware.com/shop/bepro-listings-documents/'>Documents</a> - Allow users to add and manage document listings on your website from the front end (zip, doc, pdf, odt, csv, etc)</li>
 					<li><a href='https://www.beprosoftware.com/shop/bepro-listings-icons/'>Icons</a> - Tons of google map icons from the 'Map Icons Collection' by Nicolas Mollet</li>
 					<li><a href='https://www.beprosoftware.com/shop/bepro-listings-realestate/'>Real Estate</a> - Everything needed to run a realestate website, including related info (# rooms, #baths, etc) and search options</li>
@@ -216,22 +238,18 @@
 					<li><a href='https://www.beprosoftware.com/shop/bepro-listings-favorites/'>Favorites</a> - Allow visitors and registered users to interact with listings. They can record their likes/dislikes and view them via shortcodes</li>
 					<li><a href='https://www.beprosoftware.com/shop/bepro-listings-authors/'>Authors</a> - Give your Blog writers and their listings more visibility. With this plugin you add their profile info to their listing pages.</li>
 					<li><a href='https://www.beprosoftware.com/shop/bepro-listings-pmpro/'>PMPro</a> - Use Paid Membership Pro to charge users to post listings on your website, with this integration.</li>
-					<li><a href='https://www.beprosoftware.com/shop/bepro-listings-bookings/'>Booking</a>  - Setup your availability and allow users to schedule time. Perfect for real estate, vehicle, hotel, and other niche sites</li>
 					<li><a href='https://www.beprosoftware.com/shop/bepro-listings-business-directory/'>Business Directory</a> - Use our business and staff focused listing templates with alphabetic filter. Typical phone book type layout.</li>
 					<li><a href='https://www.beprosoftware.com/shop/bepro-listings-vehicles/'>Vehicles</a>  - Lists cars, boats, trucks, planes, and other automobiles with their details</li>
 					<li><a href='https://www.beprosoftware.com/shop/bepro-listings-reviews/'>Reviews</a> - Users can leave and search by star ratings</li>
-					<li><a href='https://www.beprosoftware.com/shop/bepro-listings-search/'>Search</a> - Add predictive google maps address lookup and auto complete enhancements to the basic search feature</li>
-					<li><a href='https://www.beprosoftware.com/shop/bepro-software-api/'>Api</a> - Turn your website into a 24/7 remote content manager. Ideal for integration with other data feeds.</li>
-					<li><a href='https://www.beprosoftware.com/shop/bepro-listings-export/'>Export</a> - Export search results from BePro Lisitngs and version addons</li>
 				</ul>
 				<h2>Classifieds / Porfolio / Directory Themes</h2>
-				<p>We also have several $1 one dollar wordpress themes you can purchase with free data. This provides a great tutorial and / or way to get setup quickly</p>
+				<p>We also have several wordpress themes. Some are FREE and others you can purchase. Here you have several options for how you would like your installation to look.</p>
 				<ul>
-					<li><a href='http://www.beprosoftware.com/shop/bycater/'>ByCater</a> - Versitile theme for any <strong>wordpress lisings</strong></li>
-					<li><a href='http://www.beprosoftware.com/shop/folioprojects/'>FolioProjects</a> - Best used for <strong>Wordpress portfolios</strong></li>
-					<li><a href='http://www.beprosoftware.com/shop/mt-classifieds/'>MT CLassifieds</a> - Great <strong>Wordpress Classifieds Theme</strong></li>
-					<li><a href='http://www.beprosoftware.com/shop/whatlocalscallit/'>WhatLocalsCallIt</a> - Perfect <strong>Wordpress Directory Theme</strong></li>
-					<li><a href='http://www.beprosoftware.com/shop/mp-directory/'>MP Directory</a> - Another great <strong>Wordpress Directory Theme</strong></li>
+					<li><a href='https://www.beprosoftware.com/shop/bepro-business-directory/'>BePro Directory Theme</a> - Our first Premium Theme, perfect for most Directory implementations</li>
+					<li><a href='https://www.beprosoftware.com/shop/bycater/'>ByCater</a> - Versatile Classified theme which showcases many of the BePro Listings features</strong></li>
+					<li><a href='https://www.beprosoftware.com/shop/folioprojects/'>FolioProjects</a> - Simple image focsed theme great for Wordpress portfolios</strong></li>
+					<li><a href='https://www.beprosoftware.com/shop/mt-classifieds/'>MT CLassifieds</a> - A map focused directory Theme</strong> (FREE)</li>
+					<li><a href='https://www.beprosoftware.com/shop/whatlocalscallit/'>WhatLocalsCallIt</a> - A simple map focused Theme (FREE)</li>
 				</ul>
 				
 				<p>Check them all out on the <a href='http://www.beprosoftware.com/products/bepro-listings/'>BePro Lisitngs documentation</a> page along with <b>shortcodes</b> and <b>instructions</b></p>
@@ -399,7 +417,7 @@
 		
 		// Current version
 		if ( !defined( 'BEPRO_LISTINGS_VERSION' ) ){
-			define( 'BEPRO_LISTINGS_VERSION', '2.2.0017' );
+			define( 'BEPRO_LISTINGS_VERSION', '2.2.0040' );
 		}	
 	}
 	
@@ -436,6 +454,7 @@
 			$data["form_cat_style"] = 2;
 			$data["bepro_listings_cat_required"] = "";
 			$data["bepro_listings_cat_exclude"] = "";
+			$data["bpl_form_cols"] = 2;
 			//search listings
 			$data["default_image"] = plugins_url("images/no_img.jpg", __FILE__ );
 			$data["link_new_page"] = 1;
@@ -459,6 +478,7 @@
 			$data["protect_contact"] = "";
 			$data["show_content"] = 1;
 			$data["tabs_type"] = 1;
+			$data["bpl_details_cols"] = 2;
 			//map
 			$data["map_query_type"] = "curl";
 			$data["map_use_api"] = 1;
@@ -651,6 +671,7 @@
 	//Return Listings that meet requested critera.
 	function bepro_get_listings($returncaluse = false, $catfinder = false, $limit_clause = false){
 		global $wpdb;
+		$cat_finder = "";
 		if($catfinder)$cat_finder = "LEFT JOIN ".$wpdb->prefix."term_relationships rel ON rel.object_id = posts.ID
 				LEFT JOIN ".$wpdb->prefix."term_taxonomy tax ON tax.term_taxonomy_id = rel.term_taxonomy_id
 				LEFT JOIN ".$wpdb->prefix."terms t ON t.term_id = tax.term_id";
@@ -725,12 +746,13 @@
 
 	//On delete post, also delete the listing from the database and all attachments
 	function bepro_ajax_delete_post(){
+		check_ajax_referer( 'process-delete-listings', "nonce" );
 		if(!is_numeric($_POST["post_id"])) exit;
 		global $wpdb;
 		$post_id = $_POST["post_id"];
 		$user_data = wp_get_current_user();
 		$post_data = get_post($post_id);
-		if(is_admin() || ($post_data->post_author == $user_data->ID)){
+		if((!defined('DOING_AJAX') && is_admin() ) || ($post_data->post_author == $user_data->ID)){
 			$ans = wp_delete_post( $post_id, true );
 			if($ans){$message["status"] = __("Deleted Successfully!","bepro-listings");
 			}else{$message["status"] = __("Problem Deleting Listing","bepro-listings");
@@ -764,11 +786,11 @@
 			//retrieve variables
 			$item_name = addslashes(strip_tags($_POST["item_name"]));
 			$content = (is_admin() && is_user_logged_in())? $_POST["content"]:addslashes(strip_tags(strip_shortcodes($_POST["content"])));
-			$categories = $wpdb->escape($_POST["categories"]);
-			$username = $wpdb->escape(strip_tags($_POST["username"]));
-			$password = $wpdb->escape(strip_tags($_POST["password"]));
-			$email = $wpdb->escape(strip_tags($_POST["email"]));
-			$post_id = (empty($post_id))? $wpdb->escape($_POST["bepro_post_id"]):$post_id;
+			$categories = esc_sql($_POST["categories"]);
+			$username = esc_sql(strip_tags($_POST["username"]));
+			$password = esc_sql(strip_tags($_POST["password"]));
+			$email = esc_sql(strip_tags($_POST["email"]));
+			$post_id = (empty($post_id))? esc_sql($_POST["bepro_post_id"]):$post_id;
 			$cost =  trim(addslashes(strip_tags($_POST["cost"])));
 			$cost = str_replace(array("$",","), array("",""), $cost);
 			$cost = (!is_numeric($cost) || ($cost < 0))? "NULL": $cost; 
@@ -854,21 +876,25 @@
 						while(($counter <= $num_images) && (count($attachments) <= $num_images)) {
 							if(!empty($_FILES["bepro_form_image_".$counter]) && (!$_FILES["bepro_form_image_".$counter]["error"])){
 								$full_filename = $wp_upload_dir['path']."/".$_FILES["bepro_form_image_".$counter]["name"];
-								$check_move = @move_uploaded_file($_FILES["bepro_form_image_".$counter]["tmp_name"], $full_filename);
-								if($check_move){
-									$filename = basename($_FILES["bepro_form_image_".$counter]["name"]);
-									$filename = preg_replace('/\.[^.]+$/', '', $filename);
-									$wp_filetype = wp_check_filetype(basename($full_filename), null );
-									$attachment = array(
-										 'post_mime_type' => $wp_filetype['type'],
-										 'post_title' => $filename,
-										 'post_content' => '',
-										 'post_status' => 'inherit'
-									);
-									$attach_id = wp_insert_attachment( $attachment, $full_filename, $post_id);
-									$attach_data = wp_generate_attachment_metadata( $attach_id, $full_filename);
-									wp_update_attachment_metadata( $attach_id, $attach_data );
-									if($counter == 1)update_post_meta($post_id, '_thumbnail_id', $attach_id);
+								$wp_filetype = wp_check_filetype(basename($full_filename), null );
+								$allowed_files = array("jpg", "jpeg", "png", "mpeg", "mov", "flv", "pdf", "doc", "docx", "txt", "csv", "avi", "mp3", "wma", "wav");
+								if((in_array($wp_filetype['ext'], $allowed_files))){
+									$check_move = @move_uploaded_file($_FILES["bepro_form_image_".$counter]["tmp_name"], $full_filename);
+									if($check_move){
+										$filename = basename($_FILES["bepro_form_image_".$counter]["name"]);
+										$filename = preg_replace('/\.[^.]+$/', '', $filename);
+										
+										$attachment = array(
+											 'post_mime_type' => $wp_filetype['type'],
+											 'post_title' => $filename,
+											 'post_content' => '',
+											 'post_status' => 'inherit'
+										);
+										$attach_id = wp_insert_attachment( $attachment, $full_filename, $post_id);
+										$attach_data = wp_generate_attachment_metadata( $attach_id, $full_filename);
+										wp_update_attachment_metadata( $attach_id, $attach_data );
+										if($counter == 1)update_post_meta($post_id, '_thumbnail_id', $attach_id);
+									}
 								}
 							}
 							$counter++;
@@ -906,7 +932,14 @@
 					//calculate cost and duration
 					if(is_numeric($data["require_payment"]) && ($data["require_payment"] > 0)){
 						//Get package cost and duration
-						if(!empty($data["require_payment"]) && ($data["require_payment"] == 1)){ 
+						if(is_admin() && is_numeric($_POST["bl_order_id"])){
+							//if such an order actually exists, then save the order id
+							$order = bl_get_payment_order($bl_order_id);
+							if($order)
+								$bl_order_id = $_POST["bl_order_id"];
+							
+							//here we should verify that more can be added to the order i.e. not at max already
+						} else if(!empty($data["require_payment"]) && ($data["require_payment"] == 1)){ 
 							//if category already has an order ID then reuse it
 							if(@$listing && $listing->bl_order_id)
 								$bl_order_id = $listing->bl_order_id;
@@ -1087,17 +1120,13 @@
 			$to_addr .= !empty($_POST['state'])? ", ".$_POST['state']:"";
 			$to_addr .= !empty($_POST['country'])? ", ".$_POST['country']:"";
 			$to_addr .= !empty($_POST['postcode'])? ", ".$_POST['postcode']:"";
-			// Bepro Google map old code //
-			//$addresstofind_1 = "http://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($to_addr)."&sensor=false";
 			// March 31, 2016 By TS - Checks if the user has entered Google Map API Key //
-			if($data["map_user_api"] !== '')			
-			{
-				$addresstofind_1 = "http://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($to_addr)."&?key=".$data["map_user_api"]."";
-			}else{
-				$addresstofind_1 = "http://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($to_addr)."&sensor=false";
-			}
-			// End Of google api map logic //
-			
+ 			if(!empty($data["map_geocode_api"]))			
+ 			{
+ 				$addresstofind_1 = "https://maps.googleapis.com/maps/api/geocode/json?key=".$data["map_geocode_api"]."&address=".urlencode($to_addr)."";
+ 			}else{
+ 				$addresstofind_1 = "http://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($to_addr)."&sensor=false";
+ 			}
 			if(empty($query_type) || ($query_type == "curl")){
 				$ch = curl_init(); 
 				curl_setopt($ch, CURLOPT_URL, $addresstofind_1);
@@ -1122,8 +1151,14 @@
 			}
 			if(@$addr_search_1->status)
 				$latlon["status"] = $addr_search_1->status;
+			if(@$addr_search_1->error_message)
+				$latlon["error_message"] = $addr_search_1->error_message;
 		}
 		return $latlon;
+	}
+	
+	function add_nonce_to_form(){
+		wp_nonce_field( "frontend_form", "bpl_form_nonce", true, true );
 	}
 	
 	function bepro_add_post($post){
@@ -1131,21 +1166,21 @@
 		do_action("bepro_listings_add_listing", $post);
 		$wpdb->query("SET NAMES utf8");
 		return $wpdb->query("INSERT INTO ".$wpdb->prefix.BEPRO_LISTINGS_TABLE_NAME." SET
-			first_name    = '".$wpdb->escape(strip_tags($post['first_name']))."',
-			last_name     = '".$wpdb->escape(strip_tags($post['last_name']))."',
-			cost         = '".$wpdb->escape(strip_tags($post['cost']))."',
-			email         = '".$wpdb->escape(strip_tags($post['email']))."',
-			website       = '".$wpdb->escape(strip_tags($post['website']))."',
-			address_line1 = '".$wpdb->escape(strip_tags($post['address_line1']))."',
-			city          = '".$wpdb->escape(strip_tags($post['city']))."',
-			postcode      = '".$wpdb->escape(strip_tags($post['postcode']))."',
-			state         = '".$wpdb->escape(strip_tags($post['state']))."',
-			country       = '".$wpdb->escape(strip_tags($post['country']))."',
+			first_name    = '".esc_sql(strip_tags($post['first_name']))."',
+			last_name     = '".esc_sql(strip_tags($post['last_name']))."',
+			cost         = '".esc_sql(strip_tags($post['cost']))."',
+			email         = '".esc_sql(strip_tags($post['email']))."',
+			website       = '".esc_sql(strip_tags($post['website']))."',
+			address_line1 = '".esc_sql(strip_tags($post['address_line1']))."',
+			city          = '".esc_sql(strip_tags($post['city']))."',
+			postcode      = '".esc_sql(strip_tags($post['postcode']))."',
+			state         = '".esc_sql(strip_tags($post['state']))."',
+			country       = '".esc_sql(strip_tags($post['country']))."',
 			post_id         = '".$post['post_id']."',
-			phone         = '".$wpdb->escape(strip_tags($post['phone']))."',
-			lat           = '".$wpdb->escape(strip_tags($post['lat']))."',
-			lon           = '".$wpdb->escape(strip_tags($post['lon']))."',
-			bl_order_id   = '".$wpdb->escape(strip_tags($post['bl_order_id']))."'");
+			phone         = '".esc_sql(strip_tags($post['phone']))."',
+			lat           = '".esc_sql(strip_tags($post['lat']))."',
+			lon           = '".esc_sql(strip_tags($post['lon']))."',
+			bl_order_id   = '".esc_sql(strip_tags($post['bl_order_id']))."'");
 	}
 	
 	function bepro_update_post($post){
@@ -1153,21 +1188,21 @@
 		do_action("bepro_listings_update_listing", $post);
 		$wpdb->query("SET NAMES 'utf8'");
 		return $wpdb->query("UPDATE ".$wpdb->prefix.BEPRO_LISTINGS_TABLE_NAME." SET
-			cost    = '".$wpdb->escape(strip_tags($post['cost']))."',
-			first_name    = '".$wpdb->escape(strip_tags($post['first_name']))."',
-			last_name     = '".$wpdb->escape(strip_tags($post['last_name']))."',
-			email         = '".$wpdb->escape(strip_tags($post['email']))."',
-			phone         = '".$wpdb->escape(strip_tags($post['phone']))."',
-			address_line1 = '".$wpdb->escape(strip_tags($post['address_line1']))."',
-			city          = '".$wpdb->escape(strip_tags($post['city']))."',
-			postcode      = '".$wpdb->escape(strip_tags($post['postcode']))."',
-			state         = '".$wpdb->escape(strip_tags($post['state']))."',
-			country       = '".$wpdb->escape(strip_tags($post['country']))."',
-			lat           = '".$wpdb->escape(strip_tags($post['lat']))."',
-			lon           = '".$wpdb->escape(strip_tags($post['lon']))."',
-			website       = '".$wpdb->escape(strip_tags($post['website']))."',
-			bl_order_id   = '".$wpdb->escape(strip_tags($post['bl_order_id']))."'
-			WHERE post_id ='".$wpdb->escape(strip_tags($post['post_id']))."'");
+			cost    = '".esc_sql(strip_tags($post['cost']))."',
+			first_name    = '".esc_sql(strip_tags($post['first_name']))."',
+			last_name     = '".esc_sql(strip_tags($post['last_name']))."',
+			email         = '".esc_sql(strip_tags($post['email']))."',
+			phone         = '".esc_sql(strip_tags($post['phone']))."',
+			address_line1 = '".esc_sql(strip_tags($post['address_line1']))."',
+			city          = '".esc_sql(strip_tags($post['city']))."',
+			postcode      = '".esc_sql(strip_tags($post['postcode']))."',
+			state         = '".esc_sql(strip_tags($post['state']))."',
+			country       = '".esc_sql(strip_tags($post['country']))."',
+			lat           = '".esc_sql(strip_tags($post['lat']))."',
+			lon           = '".esc_sql(strip_tags($post['lon']))."',
+			website       = '".esc_sql(strip_tags($post['website']))."',
+			bl_order_id   = '".esc_sql(strip_tags($post['bl_order_id']))."'
+			WHERE post_id ='".esc_sql(strip_tags($post['post_id']))."'");
 	}
 	
 	//Create BePro Listings custom post type.
@@ -1523,7 +1558,11 @@
 	
 	function get_user_feature_order($user_id, $feature_id){
 		global $wpdb;
-		return $wpdb->get_results("SELECT * FROM ".BEPRO_LISTINGS_ORDERS_TABLE_NAME." WHERE feature_id =".$feature_id." AND cust_user_id =".$user_id);
+		$return = $wpdb->get_results("SELECT * FROM ".BEPRO_LISTINGS_ORDERS_TABLE_NAME." WHERE feature_id =".$feature_id." AND cust_user_id =".$user_id);
+		//potential wp_error so check before returning : 04/10/16 NH
+		if(false === $return)
+			return false;
+		return $return;
 	}
 	function get_last_bl_order(){
 		global $wpdb;
@@ -1775,6 +1814,23 @@
 		if(@$address->postcode)
 			$return_addr[] = $address->postcode;
 		
-		return implode(",",$return_addr);
+		return ltrim(implode(", ",$return_addr), ",");
+	}
+	
+	function bepro_search_wild_splice($returncaluse){
+		$bpl_state = @$_REQUEST["bpl_state"];
+		if(empty($bpl_state)) return $returncaluse;
+		
+		global $wpdb;
+		$listings = $wpdb->get_results("SELECT post_id FROM ".$wpdb->prefix.BEPRO_LISTINGS_TABLE_NAME." WHERE state ='".$bpl_state."'");
+		$post_ids = "";
+		$count = 0;
+		foreach($listings as $listing){
+			if($count > 0) $post_ids .=" ,";
+			$post_ids .= $listing->post_id;
+			$count++;
+		}
+		
+		return $returncaluse." AND posts.ID IN (".$post_ids.")";
 	}
 ?>

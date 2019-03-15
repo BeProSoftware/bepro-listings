@@ -19,7 +19,7 @@
 	//if uninstall not called from WordPress exit
 if ( !defined( 'WP_UNINSTALL_PLUGIN' ) )
 	exit ();
-
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 //delete options
 delete_option('bepro_listings');
 delete_option("bpl_rate_ignore");

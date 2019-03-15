@@ -21,6 +21,7 @@
 .sidebar_recent_imgs img{
 	width:25%;
 	height:25%;
+	margin-right:5px;
 }
 .ui-datepicker-header{
 	background:#000;
@@ -58,6 +59,10 @@
 	display: block;
 	margin: auto;
 }
+.marker_content:not(:first-of-type){
+	border-top:2px solid;
+	clear:both;
+}
 .marker_title{
 	clear:both;
 	display:block;
@@ -67,7 +72,12 @@
 }
 .marker_detais{
 	float: right;
-	width:135px;
+	width:160px;
+	word-break:break-word;
+}
+.marker_detais .addr{
+	margin-bottom:5px;
+	display:block;
 }
 .marker_links{
 	clear: right;
@@ -126,6 +136,8 @@
 .bepro_listing_category_section{
 	clear:left;
 }
+
+
 /*Details page*/
 
 .bl_succsss_message{
@@ -213,6 +225,7 @@
 .ui-tabs-vertical .ui-tabs-nav li a { display:block; }
 .ui-tabs-vertical .ui-tabs-nav li.ui-tabs-active { padding-bottom: 0; padding-right: .1em; border-right-width: 1px; border-right-width: 1px; }
 .ui-tabs-vertical .ui-tabs-panel { padding: 0; margin:0;float: right; width: 40em;width:70%}
+
 /* Cat Listing layout */
 .cat_lists{
 	float:left;
@@ -244,12 +257,24 @@
 	clear:both;
 	display:block;
 }
+.cat_list_item ul{
+	clear:both;
+}
 .cat_list_item ul li{
 	list-style-type:none;
 }
 /* form layout */
+#bepro_create_listings_form input, #bepro_create_listings_form select, #bepro_create_listings_form textarea{
+	width:100%
+}
 #bepro_create_listings_form input[type="submit"],#bepro_create_listings_form hr{
 	clear:left;
+}
+#bepro_create_listings_form input[type="submit"]{
+	background-color:green;
+	color:#fff;
+	border: 0;
+    padding: 5px;
 }
 .chosen-container {
   min-width: 150px;
@@ -283,10 +308,9 @@ padding: 5px;}
 
 }
 .bepro_form_section{
-	border-bottom: 1px dashed;
     margin: 5px 0;
     padding: 10px;
-    width: 70%;
+    width: 100%;
 }
 .bepro_form_cat{
 	margin:0 5px;
@@ -305,6 +329,9 @@ padding: 5px;}
     font-weight: bold;
     margin: 5px 0;
     text-align: center;
+}
+.blsearchbuttons input[type=submit], .blsearchbuttons button{
+	height:28px;
 }
 .filter_search_form_shortcode .label_sep{	
     clear: none;
@@ -326,10 +353,10 @@ padding: 5px;}
     width:auto;
 }
 .filter_search_form_shortcode{	
-    border: 1px solid;
+    border: 1px solid #dfdfdf;
 	float: left;
 	padding: 10px;
-	width:98%;
+	width:100%;
 }
 .error{
 	display:block;
@@ -400,4 +427,29 @@ padding: 5px;}
 /* general */
 .bl_shortcode_selected{
 	display:none;
+}
+
+/*Search Features*/
+@media (max-width: 576px) {
+	.blsearchbuttons, #search_filter_shortcode_button{
+		clear:both;
+		display:block;
+		margin-top:10px;
+	}
+}
+/*Search Features*/
+@media (max-width: 400px) {
+	.filter_search_form_shortcode div {
+		clear: both;
+		float: none;
+		display:block;
+	}
+	.filter_search_form_shortcode div input{
+		width:100%;
+		float:left;
+	}
+	.blsearchname{
+		display: block;
+		margin-top: 5px;
+	}
 }
